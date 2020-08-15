@@ -7,78 +7,78 @@ namespace Fydar.Vox.Voxelizer
 		public SurfaceDescription Description;
 		public GreedySurfaceFace[] Faces;
 
-		public override string ToString()
-		{
-			return $"({Faces?.Length} faces with {Description})";
-		}
-
 		public IEnumerable<GroupedSurfaceTransformedFace> TransformedFaces
 		{
 			get
 			{
+				sbyte depth = (sbyte)Description.Depth;
+
 				for (int i = 0; i < Faces.Length; i++)
 				{
 					var face = Faces[i];
 
-					sbyte depth = (sbyte)Description.Depth;
-
-					Vector3SByte v1;
-					Vector3SByte v2;
-					Vector3SByte v3;
-					Vector3SByte v4;
+					Vector3SByte tl;
+					Vector3SByte tr;
+					Vector3SByte bl;
+					Vector3SByte br;
 
 					if (Description.Normal == VoxelNormal.Forward)
 					{
-						v1 = new Vector3SByte(face.Position.x, face.Position.y, depth + 1);
-						v2 = new Vector3SByte(face.Position.x + 1, face.Position.y, depth + 1);
-						v3 = new Vector3SByte(face.Position.x + 1, face.Position.y + 1, depth + 1);
-						v4 = new Vector3SByte(face.Position.x, face.Position.y + 1, depth + 1);
+						tl = new Vector3SByte(face.Position.x + face.Scale.x, face.Position.y + face.Scale.y, depth);
+						tr = new Vector3SByte(face.Position.x, face.Position.y + face.Scale.y, depth);
+						bl = new Vector3SByte(face.Position.x + face.Scale.x, face.Position.y, depth);
+						br = new Vector3SByte(face.Position.x, face.Position.y, depth);
 					}
 					else if (Description.Normal == VoxelNormal.Back)
 					{
-						v1 = new Vector3SByte(face.Position.x, face.Position.y, depth);
-						v2 = new Vector3SByte(face.Position.x - 1, face.Position.y, depth);
-						v3 = new Vector3SByte(face.Position.x - 1, face.Position.y - 1, depth);
-						v4 = new Vector3SByte(face.Position.x, face.Position.y - 1, depth);
+						tl = new Vector3SByte(face.Position.x, face.Position.y + face.Scale.y, -depth);
+						tr = new Vector3SByte(face.Position.x + face.Scale.x, face.Position.y + face.Scale.y, -depth);
+						bl = new Vector3SByte(face.Position.x, face.Position.y, -depth);
+						br = new Vector3SByte(face.Position.x + face.Scale.x, face.Position.y, -depth);
 					}
 					else if (Description.Normal == VoxelNormal.Left)
 					{
-						v1 = new Vector3SByte(face.Position.x, face.Position.y, depth);
-						v2 = new Vector3SByte(face.Position.x - 1, face.Position.y, depth);
-						v3 = new Vector3SByte(face.Position.x - 1, face.Position.y + 1, depth);
-						v4 = new Vector3SByte(face.Position.x, face.Position.y + 1, depth);
+						tl = new Vector3SByte(-depth, face.Position.y + face.Scale.y, face.Position.x + face.Scale.x);
+						tr = new Vector3SByte(-depth, face.Position.y + face.Scale.y, face.Position.x);
+						bl = new Vector3SByte(-depth, face.Position.y, face.Position.x + face.Scale.x);
+						br = new Vector3SByte(-depth, face.Position.y, face.Position.x);
 					}
 					else if (Description.Normal == VoxelNormal.Right)
 					{
-						v1 = new Vector3SByte(face.Position.x, face.Position.y, depth - 1);
-						v2 = new Vector3SByte(face.Position.x - 1, face.Position.y, depth - 1);
-						v3 = new Vector3SByte(face.Position.x - 1, face.Position.y - 1, depth - 1);
-						v4 = new Vector3SByte(face.Position.x, face.Position.y - 1, depth - 1);
+						tl = new Vector3SByte(depth, face.Position.y + face.Scale.y, face.Position.x);
+						tr = new Vector3SByte(depth, face.Position.y + face.Scale.y, face.Position.x + face.Scale.x);
+						bl = new Vector3SByte(depth, face.Position.y, face.Position.x);
+						br = new Vector3SByte(depth, face.Position.y, face.Position.x + face.Scale.x);
 					}
 					else if (Description.Normal == VoxelNormal.Up)
 					{
-						v1 = new Vector3SByte(face.Position.x + 1, face.Position.y, depth);
-						v2 = new Vector3SByte(face.Position.x + 1, face.Position.y, depth + 1);
-						v3 = new Vector3SByte(face.Position.x + 1, face.Position.y + 1, depth + 1);
-						v4 = new Vector3SByte(face.Position.x + 1, face.Position.y + 1, depth);
+						tl = new Vector3SByte(face.Position.x, depth, face.Position.y + face.Scale.y);
+						tr = new Vector3SByte(face.Position.x + face.Scale.x, depth, face.Position.y + face.Scale.y);
+						bl = new Vector3SByte(face.Position.x, depth, face.Position.y);
+						br = new Vector3SByte(face.Position.x + face.Scale.x, depth, face.Position.y);
 					}
 					else // if (Description.Normal == Vector3SByte.Down)
 					{
-						v1 = new Vector3SByte(face.Position.x, face.Position.y, depth);
-						v2 = new Vector3SByte(face.Position.x, face.Position.y, depth - 1);
-						v3 = new Vector3SByte(face.Position.x, face.Position.y + 1, depth - 1);
-						v4 = new Vector3SByte(face.Position.x, face.Position.y + 1, depth);
+						tl = new Vector3SByte(face.Position.x, -depth, face.Position.y);
+						tr = new Vector3SByte(face.Position.x + face.Scale.x, -depth, face.Position.y);
+						bl = new Vector3SByte(face.Position.x, -depth, face.Position.y + face.Scale.y);
+						br = new Vector3SByte(face.Position.x + face.Scale.x, -depth, face.Position.y + face.Scale.y);
 					}
 
 					yield return new GroupedSurfaceTransformedFace()
 					{
-						BottomLeft = VoxelNormal.RotateAroundOrigin(v1, Description.Normal),
-						TopLeft = VoxelNormal.RotateAroundOrigin(v2, Description.Normal),
-						TopRight = VoxelNormal.RotateAroundOrigin(v3, Description.Normal),
-						BottomRight = VoxelNormal.RotateAroundOrigin(v4, Description.Normal)
+						TopLeft = tl,
+						TopRight = tr,
+						BottomLeft = bl,
+						BottomRight = br
 					};
 				}
 			}
+		}
+
+		public override string ToString()
+		{
+			return $"({Faces?.Length} faces with {Description})";
 		}
 	}
 }
