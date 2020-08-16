@@ -1,4 +1,4 @@
-﻿namespace Fydar.Vox.Voxelizer
+﻿namespace Fydar.Vox.Meshing
 {
 	public struct GroupedSurfaceTransformedFace
 	{

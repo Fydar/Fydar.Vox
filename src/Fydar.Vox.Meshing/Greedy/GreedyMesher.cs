@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Fydar.Vox.Voxelizer.Greedy
+namespace Fydar.Vox.Meshing.Greedy
 {
 	public class GreedyMesher
 	{

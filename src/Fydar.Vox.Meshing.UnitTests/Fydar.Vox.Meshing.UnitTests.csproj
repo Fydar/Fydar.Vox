@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Fydar.Vox.Voxelizer\Fydar.Vox.Voxelizer.csproj" />
+    <ProjectReference Include="..\Fydar.Vox.Meshing\Fydar.Vox.Meshing.csproj" />
   </ItemGroup>
 
 </Project>

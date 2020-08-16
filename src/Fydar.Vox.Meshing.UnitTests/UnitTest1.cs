@@ -1,4 +1,4 @@
-using Fydar.Vox.Voxelizer;
+using Fydar.Vox.Meshing;
 using NUnit.Framework;
 using System.Linq;
 

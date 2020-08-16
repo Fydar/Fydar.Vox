@@ -7,13 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fydar.Vox.VoxFiles", "Fydar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fydar.Vox.ConsoleDemo", "Fydar.Vox.ConsoleDemo\Fydar.Vox.ConsoleDemo.csproj", "{6982F994-3A27-445A-9090-411478E19DCC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fydar.Vox.Voxelizer", "Fydar.Vox.Voxelizer\Fydar.Vox.Voxelizer.csproj", "{446BAB30-25C1-4E94-8D2F-717A932CE33C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fydar.Vox.Meshing", "Fydar.Vox.Meshing\Fydar.Vox.Meshing.csproj", "{446BAB30-25C1-4E94-8D2F-717A932CE33C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fydar.Vox.Web", "Fydar.Vox.Web\Fydar.Vox.Web.csproj", "{6EFE972B-EBEA-467C-9E8F-D3DCBAE972B1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fydar.Vox.Models", "Fydar.Vox.Models\Fydar.Vox.Models.csproj", "{93934E82-CDF1-4426-BC19-109953902FCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fydar.Vox.Voxeliser.UnitTests", "Fydar.Vox.Voxeliser.UnitTests\Fydar.Vox.Voxeliser.UnitTests.csproj", "{73F4FE98-C881-42C7-9267-F450579D1BC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fydar.Vox.Meshing.UnitTests", "Fydar.Vox.Meshing.UnitTests\Fydar.Vox.Meshing.UnitTests.csproj", "{73F4FE98-C881-42C7-9267-F450579D1BC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
