@@ -2,9 +2,9 @@
 
 namespace Fydar.Vox.Voxelizer
 {
-	public struct GroupedSurface
+	public struct GroupedSurface : ISurface
 	{
-		public SurfaceDescription Description;
+		public SurfaceDescription Description { get; set; }
 		public GroupedSurfaceFace[] Faces;
 
 		public IEnumerable<GroupedSurfaceTransformedFace> TransformedFaces
