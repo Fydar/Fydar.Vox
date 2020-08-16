@@ -10,10 +10,7 @@ namespace Fydar.Vox.VoxFiles
 		public VoxelModel[] Models { get; set; }
 		public VoxelColourPallette Pallette { get; set; }
 		public VoxelLayer[] Layers { get; set; }
-
 		public VoxelNode Root { get; set; }
-
-		public List<VoxDocumentNodeChunk> HierarchyNodes;
 
 		public VoxelScene(VoxDocument document)
 		{
@@ -25,132 +22,81 @@ namespace Fydar.Vox.VoxFiles
 
 		private static VoxelNode LoadHierarchy(VoxelScene scene, VoxDocument document, VoxelLayer[] layers)
 		{
-			var transformChunks = new List<VoxDocumentTransformNodeChunk>();
-			var groupChunks = new List<VoxDocumentGroupNodeChunk>();
-			var shapeChunks = new List<VoxDocumentShapeNodeChunk>();
-
-			// Find and construct nodes from the file
-			foreach (var chunk in document.Main.Children)
-			{
-				switch (chunk.NameToString())
-				{
-					case "nTRN":
-					{
-						int offset = chunk.ContentStartIndex;
-
-						int nodeId = document.ReadInt32(ref offset);
-						var nodeAttributes = document.ReadStructure<VoxStructureDictionary>(ref offset);
-						int childNodeId = document.ReadInt32(ref offset);
-						int reservedId = document.ReadInt32(ref offset);
-						int layerId = document.ReadInt32(ref offset);
-						int numberOfFrames = document.ReadInt32(ref offset);
-
-						var voxelTransform = new VoxDocumentTransformNodeChunk()
-						{
-							NodeId = nodeId,
-							NodeAttributes = nodeAttributes,
-							ChildNodeId = childNodeId,
-							LayerId = layerId,
-							NumberOfFrames = numberOfFrames,
-							ReservedId = reservedId
-						};
-						transformChunks.Add(voxelTransform);
-						break;
-					}
-					case "nGRP":
-					{
-						int offset = chunk.ContentStartIndex;
-
-						int nodeId = document.ReadInt32(ref offset);
-						var nodeAttributes = document.ReadStructure<VoxStructureDictionary>(ref offset);
-						var childrenIds = document.ReadStructure<VoxStructureIntArray>(ref offset);
-
-						var voxelGroup = new VoxDocumentGroupNodeChunk()
-						{
-							NodeId = nodeId,
-							NodeAttributes = nodeAttributes,
-							ChildrenIds = childrenIds
-						};
-						groupChunks.Add(voxelGroup);
-						break;
-					}
-					case "nSHP":
-					{
-						int offset = chunk.ContentStartIndex;
-
-						int nodeId = document.ReadInt32(ref offset);
-						var nodeAttributes = document.ReadStructure<VoxStructureDictionary>(ref offset);
-						var models = document.ReadStructure<VoxStructureShapeModelArray>(ref offset);
-
-						var voxelShape = new VoxDocumentShapeNodeChunk()
-						{
-							NodeId = nodeId,
-							NodeAttributes = nodeAttributes,
-							Models = models,
-						};
-						shapeChunks.Add(voxelShape);
-						break;
-					}
-				}
-			}
-
 			VoxelTransform root = null;
 			var nodes = new Dictionary<int, VoxelNode>();
 
-			foreach (var transformChunk in transformChunks)
+			foreach (var chunk in document.Main.Children)
 			{
-				var transformNode = new VoxelTransform(transformChunk.NodeId)
+				if (VoxChunks.nTRN.CanImport(chunk.NameToString()))
 				{
-					NodeAttributes = transformChunk.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-					Layer = layers.FirstOrDefault(layer => layer.LayerId == transformChunk.LayerId),
-					ReservedId = transformChunk.ReservedId,
-				};
-				if (root == null)
-				{
-					root = transformNode;
+					int offset = chunk.ContentStartIndex;
+					var chunknTRN = VoxChunks.nTRN.Read(document, ref offset);
+
+					var transformNode = new VoxelTransform(chunknTRN.NodeId)
+					{
+						NodeAttributes = chunknTRN.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+						Layer = layers.FirstOrDefault(layer => layer.LayerId == chunknTRN.LayerId),
+						ReservedId = chunknTRN.ReservedId,
+						childNodeId = chunknTRN.ChildNodeId
+					};
+					if (root == null)
+					{
+						root = transformNode;
+					}
+					nodes.Add(transformNode.NodeId, transformNode);
 				}
-				nodes.Add(transformNode.NodeId, transformNode);
 			}
-			foreach (var shapeChunk in shapeChunks)
+			foreach (var chunk in document.Main.Children)
 			{
-				var shapeNode = new VoxelShape(shapeChunk.NodeId)
+				if (VoxChunks.nSHP.CanImport(chunk.NameToString()))
 				{
-					NodeAttributes = shapeChunk.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-					Models = shapeChunk.Models.Elements
+					int offset = chunk.ContentStartIndex;
+					var chunknSHP = VoxChunks.nSHP.Read(document, ref offset);
+
+					var shapeNode = new VoxelShape(chunknSHP.NodeId)
+					{
+						NodeAttributes = chunknSHP.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+						Models = chunknSHP.Models.Elements
 						.Select(model => scene.Models[model.ModelId])
 						.ToList()
-				};
-				foreach (var model in shapeNode.Models)
-				{
-					model.Shape = shapeNode;
+					};
+					foreach (var model in shapeNode.Models)
+					{
+						model.Shape = shapeNode;
+					}
+					nodes.Add(shapeNode.NodeId, shapeNode);
 				}
-				nodes.Add(shapeNode.NodeId, shapeNode);
 			}
-			foreach (var groupChunk in groupChunks)
+			foreach (var chunk in document.Main.Children)
 			{
-				var groupNode = new VoxelGrouping(groupChunk.NodeId)
+				if (VoxChunks.nGRP.CanImport(chunk.NameToString()))
 				{
-					NodeAttributes = groupChunk.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-				};
-				nodes.Add(groupNode.NodeId, groupNode);
+					int offset = chunk.ContentStartIndex;
+					var chunknGRP = VoxChunks.nGRP.Read(document, ref offset);
+
+					var groupNode = new VoxelGrouping(chunknGRP.NodeId)
+					{
+						NodeAttributes = chunknGRP.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+					};
+
+					foreach (int child in chunknGRP.ChildrenIds.Values)
+					{
+						var groupChildEntry = nodes[child];
+						groupNode.Children.Add(groupChildEntry);
+						groupChildEntry.Parent = groupNode;
+					}
+
+					nodes.Add(groupNode.NodeId, groupNode);
+				}
 			}
 
-			foreach (var transformChunk in transformChunks)
+			foreach (var node in nodes)
 			{
-				var transformNode = (VoxelTransform)nodes[transformChunk.NodeId];
-
-				var transformedChild = nodes[transformChunk.ChildNodeId];
-				transformNode.ChildNode = transformedChild;
-				transformedChild.Parent = transformNode;
-			}
-			foreach (var groupChunk in groupChunks)
-			{
-				var groupNode = (VoxelGrouping)nodes[groupChunk.NodeId];
-				foreach (int child in groupChunk.ChildrenIds.Values)
+				if (node.Value is VoxelTransform transformNode)
 				{
-					var groupChildEntry = nodes[child];
-					groupNode.Children.Add(groupChildEntry);
-					groupChildEntry.Parent = groupNode;
+					var transformedChild = nodes[transformNode.childNodeId];
+					transformNode.ChildNode = transformedChild;
+					transformedChild.Parent = transformNode;
 				}
 			}
 
@@ -167,50 +113,29 @@ namespace Fydar.Vox.VoxFiles
 			foreach (var chunk in document.Main.Children)
 			{
 				var content = chunk.Content;
+				int offset = chunk.ContentStartIndex;
 
 				switch (chunk.NameToString())
 				{
 					case "SIZE":
 					{
-						int offset = chunk.ContentStartIndex;
-
-						int x = document.ReadInt32(ref offset);
-						int y = document.ReadInt32(ref offset);
-						int z = document.ReadInt32(ref offset);
+						var chunkSIZE = VoxChunks.SIZE.Read(document, ref offset);
 
 						lastDiamentions = new VoxDocumentDiamentions()
 						{
-							X = x,
-							Y = y,
-							Z = z
+							X = chunkSIZE.X,
+							Y = chunkSIZE.Y,
+							Z = chunkSIZE.Z
 						};
 						break;
 					}
 					case "XYZI":
 					{
-						int offset = chunk.ContentStartIndex;
-
-						int voxelsCount = document.ReadInt32(ref offset);
-
-						var voxelArray = new VoxDocumentVoxel[voxelsCount];
-						for (int i = 0; i < voxelsCount; i++)
-						{
-							byte x = document.ReadByte(ref offset);
-							byte y = document.ReadByte(ref offset);
-							byte z = document.ReadByte(ref offset);
-							byte index = document.ReadByte(ref offset);
-
-							voxelArray[i] = new VoxDocumentVoxel(x, y, z, index);
-						}
-
-						var voxels = new VoxDocumentVoxels()
-						{
-							Voxels = voxelArray
-						};
+						var chunkXYZI = VoxChunks.XYZI.Read(document, ref offset);
 
 						if (lastDiamentions != null)
 						{
-							models.Add(new VoxelModel(scene, lastDiamentions.Value, voxels));
+							models.Add(new VoxelModel(scene, lastDiamentions.Value, chunkXYZI.Voxels));
 						}
 						else
 						{
@@ -225,28 +150,24 @@ namespace Fydar.Vox.VoxFiles
 
 		private static VoxelLayer[] LoadLayers(VoxDocument document)
 		{
-			var layers = new List<VoxelLayer>();
+			var layers = new List<VoxelLayer>(8);
 
 			foreach (var chunk in document.Main.Children)
 			{
 				if (chunk.NameToString() == "LAYR")
 				{
 					int offset = chunk.ContentStartIndex;
-
-					int layerId = document.ReadInt32(ref offset);
-					var voxDictionary = document.ReadStructure<VoxStructureDictionary>(ref offset);
-					int reservedId = document.ReadInt32(ref offset);
+					var chunkLAYR = VoxChunks.LAYR.Read(document, ref offset);
 
 					var layerAttributes = new Dictionary<string, string>();
-					foreach (var kvp in voxDictionary.KeyValuePairs)
+					foreach (var kvp in chunkLAYR.VoxDictionary.KeyValuePairs)
 					{
 						layerAttributes.Add(kvp.Key, kvp.Value);
 					}
 
-					var layer = new VoxelLayer(layerId)
+					var layer = new VoxelLayer(chunkLAYR.LayerId, chunkLAYR.VoxDictionary.KeyValuePairs)
 					{
-						LayerAttributes = layerAttributes,
-						ReservedId = reservedId
+						ReservedId = chunkLAYR.ReservedId
 					};
 					layers.Add(layer);
 				}
@@ -262,24 +183,14 @@ namespace Fydar.Vox.VoxFiles
 				if (chunk.NameToString() == "RGBA")
 				{
 					int offset = chunk.ContentStartIndex;
+					var chunkRGBA = VoxChunks.RGBA.Read(document, ref offset);
 
 					var colours = new VoxDocumentColour[256];
-					for (int i = 0; i < 255; i++)
+					int index = 1;
+					foreach (var color in chunkRGBA.Colours.Colours)
 					{
-						byte r = document.ReadByte(ref offset);
-						byte g = document.ReadByte(ref offset);
-						byte b = document.ReadByte(ref offset);
-						byte a = document.ReadByte(ref offset);
-
-						var colour = new VoxDocumentColour()
-						{
-							R = r,
-							G = g,
-							B = b,
-							A = a
-						};
-
-						colours[i + 1] = colour;
+						colours[index] = color;
+						index++;
 					}
 
 					return new VoxelColourPallette()
