@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Fydar.Vox.Voxelizer
+namespace Fydar.Vox.Meshing
 {
 	public struct Vector2SByte : IEquatable<Vector2SByte>
 	{

@@ -1,5 +1,5 @@
-﻿using Fydar.Vox.Voxelizer;
-using Fydar.Vox.Voxelizer.Greedy;
+﻿using Fydar.Vox.Meshing;
+using Fydar.Vox.Meshing.Greedy;
 
 namespace Fydar.Voxelizer.Demo
 {
