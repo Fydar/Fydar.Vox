@@ -15,7 +15,7 @@ namespace Fydar.Vox.VoxFiles
 
 		public VoxelColourPallette VoxelColourPallette => VoxelScene.Pallette;
 
-		public VoxelModel(VoxelScene voxelScene, VoxDocumentDiamentions diamentions, VoxDocumentVoxels voxDocumentVoxels)
+		public VoxelModel(VoxelScene voxelScene, VoxDocumentDiamentions diamentions, VoxStructureVoxelArray voxDocumentVoxels)
 		{
 			VoxelScene = voxelScene;
 			Width = diamentions.X;

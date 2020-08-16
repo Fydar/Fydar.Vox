@@ -4,6 +4,8 @@ namespace Fydar.Vox.VoxFiles.Hierarchy
 {
 	public class VoxelTransform : VoxelNode
 	{
+		internal int childNodeId;
+
 		public VoxelNode ChildNode { get; set; }
 		public VoxelLayer Layer { get; set; }
 

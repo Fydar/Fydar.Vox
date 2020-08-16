@@ -12,7 +12,6 @@ namespace Fydar.Vox.ConsoleDemo
 		{
 			FirstDemo.Run();
 
-
 			var fileInfo = new FileInfo("demo-scene.vox");
 
 			var document = new VoxDocument(File.ReadAllBytes(fileInfo.FullName));
@@ -24,6 +23,7 @@ namespace Fydar.Vox.ConsoleDemo
 
 			Console.WriteLine("Colour Pallette");
 			VoxelConsoleRenderer.RenderLargeColourPallette(voxelScene.Pallette);
+			// VoxelConsoleRenderer.RenderSmallColourPallette(voxelScene.Pallette);
 
 			Console.WriteLine();
 

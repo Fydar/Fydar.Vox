@@ -27,26 +27,19 @@ namespace Fydar.Vox.Voxeliser.UnitTests
 			}
 		}
 
-
-		[SetUp]
-		public void Setup()
-		{
-		}
-
-		[Test]
-		public void GenerateImplementation()
-		{
-
-		}
-
 		[Test]
 		public void ShouldVoxeliseCube()
 		{
 			foreach (var offset in new Vector3SByte[] {
 				new Vector3SByte(0, 0, 0),
 				new Vector3SByte(0, 5, 0),
+				new Vector3SByte(0, -5, 0),
 				new Vector3SByte(0, 0, 5),
-				new Vector3SByte(5, 0, 0)
+				new Vector3SByte(0, 0, -5),
+				new Vector3SByte(5, 0, 0),
+				new Vector3SByte(-5, 0, 0),
+				new Vector3SByte(1, 1, 1),
+				new Vector3SByte(-1, -1, -1),
 			})
 			{
 				var cube = new FaceGrouper(new CubeVoxelDriver(offset)).Voxelize();

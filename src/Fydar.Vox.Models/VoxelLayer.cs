@@ -18,10 +18,17 @@ namespace Fydar.Vox.VoxFiles
 			}
 		}
 
-		public VoxelLayer(int layerId)
+		public VoxelLayer(int layerId, IEnumerable<KeyValuePair<string, string>> tags = null)
 		{
 			LayerId = layerId;
 			LayerAttributes = new Dictionary<string, string>();
+			if (tags != null)
+			{
+				foreach (var tag in tags)
+				{
+					LayerAttributes.Add(tag.Key, tag.Value);
+				}
+			}
 		}
 
 		public override string ToString()
