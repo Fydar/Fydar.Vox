@@ -1,0 +1,213 @@
+﻿@using Fydar.Vox.Voxelizer;
+@using System;
+@using System.Numerics;
+
+@page "/mesh"
+@inject HttpClient Http
+
+<h1>Mesh</h1>
+
+@{
+	var world = Matrix4x4.CreateScale(1.0f)
+		* Matrix4x4.CreateTranslation(PositionX, PositionY, PositionZ);
+
+	var cameraRotation = Matrix4x4.CreateRotationY(DegToRad(RotationY + 180))
+		* Matrix4x4.CreateRotationX(DegToRad(RotationX));
+	var view = cameraRotation * Matrix4x4.CreateTranslation(new Vector3(0.0f, 0.0f, Distance));
+
+	var projection = Matrix4x4.CreatePerspectiveFieldOfView(DegToRad(FoV), 1.0f, 1.0f, 5000000.0f);
+
+	var matrix = world * view * projection;
+}
+
+@{
+	IMesh mesh = null;
+	var faces = new List<TransformedFace>(100);
+	if (meshes != null)
+	{
+		if (meshes[Model].Grouped.Surfaces != null)
+		{
+			if (Mode == 0)
+			{
+				mesh = meshes[Model].Grouped;
+			}
+			else
+			{
+				mesh = meshes[Model].Greedy;
+			}
+		}
+	}
+}
+
+<svg width="620" height="620" style="border: 1px solid #eee">
+	@if (mesh != null)
+	{
+		@foreach (var group in mesh.Surfaces)
+		{
+			@foreach (var face in group.TransformedFaces)
+			{
+				var v1 = new Vector4(face.TopLeft.x, face.TopLeft.y, face.TopLeft.z, 1.0f);
+				var v2 = new Vector4(face.TopRight.x, face.TopRight.y, face.TopRight.z, 1.0f);
+				var v3 = new Vector4(face.BottomRight.x, face.BottomRight.y, face.BottomRight.z, 1.0f);
+				var v4 = new Vector4(face.BottomLeft.x, face.BottomLeft.y, face.BottomLeft.z, 1.0f);
+
+				var v1s = ClipToScreenSpace(Vector4.Transform(v1, matrix));
+				var v2s = ClipToScreenSpace(Vector4.Transform(v2, matrix));
+				var v3s = ClipToScreenSpace(Vector4.Transform(v3, matrix));
+				var v4s = ClipToScreenSpace(Vector4.Transform(v4, matrix));
+
+				if (v1s.X < 0 || v1s.X > 1.0f
+					|| v2s.X < 0 || v2s.X > 1.0f
+					|| v3s.X < 0 || v3s.X > 1.0f
+					|| v4s.X < 0 || v4s.X > 1.0f)
+				{
+					continue;
+				}
+
+				v1s *= new Vector3(620.0f, 620.0f, 1.0f);
+				v2s *= new Vector3(620.0f, 620.0f, 1.0f);
+				v3s *= new Vector3(620.0f, 620.0f, 1.0f);
+				v4s *= new Vector3(620.0f, 620.0f, 1.0f);
+
+				var trans = new TransformedFace()
+				{
+					V1 = v1s,
+					V2 = v2s,
+					V3 = v3s,
+					V4 = v4s,
+					Color = group.Description.Colour
+				};
+
+				// Draw a grayscale colour based on vertex distance.
+				// trans.Color = Colour24.Lerp(Colour24.White, Colour24.Black,
+				//    Math.Clamp((float)trans.Average.Z * 2.5f, 0.0f, 1.0f));
+
+				faces.Add(trans);
+			}
+		}
+		
+		faces.Sort((lhs, rhs) => lhs.MinZ.CompareTo(rhs.MinZ));
+
+		@foreach (var face in faces)
+		{
+			if (face.MinZ < 0)
+			{
+				continue;
+			}
+
+			<polygon points="@face.V1.X,@face.V1.Y @face.V2.X,@face.V2.Y @face.V3.X,@face.V3.Y @face.V4.X,@face.V4.Y"
+						style="fill: @face.Color.ToHexString(); stroke: #000; stroke-width: 1; fill-rule: evenodd;" />
+		}
+	}
+</svg>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Model</div>
+	<div style="width: 64px;">@Model</div>
+	<input type="range" min="0" max="@(meshes?.Length - 1 ?? 0)" @bind="@Model" @bind:event="oninput" />
+</div>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Mode</div>
+	<div style="width: 64px;">@Mode</div>
+	<input type="range" min="0" max="1" @bind="@Mode" @bind:event="oninput" />
+</div>
+
+<div class="input-group">
+	<input type="text" @bind="@PositionX" />
+	<input type="text" @bind="@PositionY" />
+	<input type="text" @bind="@PositionZ" />
+</div>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Distance</div>
+	<div style="width: 64px;">@Distance</div>
+	<input type="range" style="flex-grow: 1" min="0" max="250" step="0.1" @bind="@Distance" @bind:event="oninput" />
+</div>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">FoV</div>
+	<div style="width: 64px;">@FoV</div>
+	<input type="range" style="flex-grow: 1" min="10" max="120" step="0.1" @bind="@FoV" @bind:event="oninput" />
+</div>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Pitch</div>
+	<div style="width: 64px;">@RotationX</div>
+	<input type="range" style="flex-grow: 1" min="-90" max="90" step="0.1" @bind="@RotationX" @bind:event="oninput" />
+</div>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Direction</div>
+	<div style="width: 64px;">@RotationY</div>
+	<input type="range" style="flex-grow: 1" min="-179" max="179" step="0.1" @bind="@RotationY" @bind:event="oninput" />
+</div>
+
+@code {
+	private DemoModel[] meshes = null;
+
+	private int Model = 0;
+	private int Mode = 0;
+	private float PositionX = 0.0f;
+	private float PositionY = 0.0f;
+	private float PositionZ = 0.0f;
+
+	private float Distance = 30.0f;
+	private float FoV = 60.0f;
+
+	private float RotationX = -45.0f;
+	private float RotationY = 45.0f;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await DemoModels.Init(Http);
+
+		meshes = new DemoModel[]
+		{
+			DemoModels.CubeA,
+			DemoModels.CubeB,
+			DemoModels.CubeC,
+			DemoModels.CubeD,
+			DemoModels.Donut,
+			DemoModels.ShapeA,
+			};
+	}
+}
+
+@functions {
+	struct TransformedFace
+	{
+		public Vector3 V1;
+		public Vector3 V2;
+		public Vector3 V3;
+		public Vector3 V4;
+		public Colour24 Color;
+
+		public Vector3 Average
+		{
+			get
+			{
+				return (V1 + V2 + V3 + V4) / 4;
+			}
+		}
+
+		public float MinZ
+		{
+			get
+			{
+				return Math.Min(V1.Z, Math.Min(V2.Z, Math.Min(V3.Z, V4.Z)));
+			}
+		}
+	}
+
+	public static float DegToRad(float degrees)
+	{
+		float radians = ((float)Math.PI / 180.0f) * degrees;
+		return radians;
+	}
+
+	public static Vector3 ClipToScreenSpace(Vector4 clipSpace)
+	{
+		return ((new Vector3(clipSpace.X, clipSpace.Y, clipSpace.Z) / clipSpace.W) + new Vector3(1.0f, 1.0f, 0)) * new Vector3(0.5f, 0.5f, 1.0f);
+	}
+}
