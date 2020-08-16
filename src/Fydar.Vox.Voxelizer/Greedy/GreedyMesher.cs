@@ -27,12 +27,13 @@ namespace Fydar.Vox.Voxelizer.Greedy
 					return lhs.Position.x.CompareTo(rhs.Position.x);
 				});
 
-				GreedySurfaceFace? chainLast = null;
-				foreach (var currentFace in sortedBuffer)
+				GreedySurfaceFace? chainLastNull = null;
+				for (int i = 0; i < sortedBuffer.Count; i++)
 				{
-					if (chainLast == null)
+					var currentFace = sortedBuffer[i];
+					if (chainLastNull == null)
 					{
-						chainLast = new GreedySurfaceFace()
+						chainLastNull = new GreedySurfaceFace()
 						{
 							Position = currentFace.Position,
 							Scale = new Vector2SByte(1, 1)
@@ -40,21 +41,51 @@ namespace Fydar.Vox.Voxelizer.Greedy
 					}
 					else
 					{
-						var lastFace = chainLast.Value;
+						var chainedFace = chainLastNull.Value;
 
-						if (lastFace.ConnectsWithX(currentFace))
+						if (chainedFace.ConnectsWithX(currentFace))
 						{
-							chainLast = new GreedySurfaceFace()
+							chainLastNull = new GreedySurfaceFace()
 							{
-								Position = lastFace.Position,
-								Scale = lastFace.Scale + new Vector2SByte(1, 0)
+								Position = chainedFace.Position,
+								Scale = chainedFace.Scale + new Vector2SByte(1, 0)
 							};
 						}
 						else
 						{
-							outputFacesBuffer.Add(lastFace);
+							bool didChainVertically = false;
+							// Iterate over every previously chained face
+							for (int j = outputFacesBuffer.Count - 1; j >= 0; j--)
+							{
+								var previousChainedFace = outputFacesBuffer[j];
 
-							chainLast = new GreedySurfaceFace()
+								if (previousChainedFace.ConnectsWithY(chainedFace))
+								{
+									previousChainedFace = new GreedySurfaceFace()
+									{
+										Position = previousChainedFace.Position,
+										Scale = previousChainedFace.Scale + new Vector2SByte(0, chainedFace.Scale.y)
+									};
+
+									didChainVertically = true;
+									outputFacesBuffer[j] = previousChainedFace;
+									break;
+								}
+
+								// If the previous face is further away than the last row that we
+								// previously procesed, stop searching.
+								if (chainedFace.Position.y == previousChainedFace.Position.y - 2)
+								{
+									break;
+								}
+							}
+
+							if (!didChainVertically)
+							{
+								outputFacesBuffer.Add(chainedFace);
+							}
+
+							chainLastNull = new GreedySurfaceFace()
 							{
 								Position = currentFace.Position,
 								Scale = new Vector2SByte(1, 1)
@@ -62,9 +93,9 @@ namespace Fydar.Vox.Voxelizer.Greedy
 						}
 					}
 				}
-				if (chainLast != null)
+				if (chainLastNull != null)
 				{
-					outputFacesBuffer.Add(chainLast.Value);
+					outputFacesBuffer.Add(chainLastNull.Value);
 				}
 				outputSurfaces.Add(new GreedySurface()
 				{
