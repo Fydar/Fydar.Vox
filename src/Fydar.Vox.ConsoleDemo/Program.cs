@@ -17,7 +17,7 @@ namespace Fydar.Vox.ConsoleDemo
 			var document = new VoxDocument(File.ReadAllBytes(fileInfo.FullName));
 			Console.WriteLine(document.FileVersionNumber);
 
-			PrintStructure(document.Main);
+			// PrintStructure(document.Main);
 
 			var voxelScene = new VoxelScene(document);
 
@@ -38,7 +38,7 @@ namespace Fydar.Vox.ConsoleDemo
 			Console.WriteLine("Models");
 			foreach (var model in voxelScene.Models)
 			{
-				Console.WriteLine(model.Shape.Parent.Name);
+				Console.WriteLine(model.Parents[0].Name);
 			}
 		}
 

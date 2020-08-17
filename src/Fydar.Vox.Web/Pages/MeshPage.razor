@@ -23,17 +23,17 @@
 @{
 	IMesh mesh = null;
 	var faces = new List<TransformedFace>(100);
-	if (meshes != null)
+	if (DemoModels.Models != null)
 	{
-		if (meshes[Model].Grouped.Surfaces != null)
+		if (DemoModels.Models[Model].Grouped.Surfaces != null)
 		{
 			if (Mode == 0)
 			{
-				mesh = meshes[Model].Grouped;
+				mesh = DemoModels.Models[Model].Grouped;
 			}
 			else
 			{
-				mesh = meshes[Model].Greedy;
+				mesh = DemoModels.Models[Model].Greedy;
 			}
 		}
 	}
@@ -104,7 +104,7 @@
 <div class="input-group">
 	<div style="width: 96px; font-weight: bold;">Model</div>
 	<div style="width: 64px;">@Model</div>
-	<input type="range" min="0" max="@(meshes?.Length - 1 ?? 0)" @bind="@Model" @bind:event="oninput" />
+	<input type="range" style="flex-grow: 1" min="0" max="@(DemoModels.Models?.Count - 1 ?? 0)" @bind="@Model" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
@@ -144,33 +144,21 @@
 </div>
 
 @code {
-	private DemoModel[] meshes = null;
-
 	private int Model = 0;
 	private int Mode = 0;
-	private float PositionX = 0.0f;
-	private float PositionY = 0.0f;
-	private float PositionZ = 0.0f;
+	private float PositionX = -3.5f;
+	private float PositionY = -5.0f;
+	private float PositionZ = -4.0f;
 
-	private float Distance = 30.0f;
+	private float Distance = 20.0f;
 	private float FoV = 60.0f;
 
-	private float RotationX = -45.0f;
+	private float RotationX = -33.0f;
 	private float RotationY = 45.0f;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await DemoModels.Init(Http);
-
-		meshes = new DemoModel[]
-		{
-			DemoModels.CubeA,
-			DemoModels.CubeB,
-			DemoModels.CubeC,
-			DemoModels.CubeD,
-			DemoModels.Donut,
-			DemoModels.ShapeA,
-			};
 	}
 }
 
