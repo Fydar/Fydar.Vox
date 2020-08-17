@@ -23,7 +23,6 @@ namespace Fydar.Vox.VoxFiles
 			{
 				throw new InvalidOperationException("Document is not in the \"VOX\" file format.");
 			}
-			Console.WriteLine(fileTypeHeader);
 
 			int offset = 4;
 			FileVersionNumber = ReadInt32(ref offset);

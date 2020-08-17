@@ -62,7 +62,7 @@ namespace Fydar.Vox.VoxFiles
 					};
 					foreach (var model in shapeNode.Models)
 					{
-						model.Shape = shapeNode;
+						model.Parents.Add(shapeNode);
 					}
 					nodes.Add(shapeNode.NodeId, shapeNode);
 				}
@@ -104,9 +104,9 @@ namespace Fydar.Vox.VoxFiles
 			return root;
 		}
 
-		private static VoxelModel[] LoadModels(VoxelScene scene, VoxDocument document)
+		private static EditableVoxelModel[] LoadModels(VoxelScene scene, VoxDocument document)
 		{
-			var models = new List<VoxelModel>();
+			var models = new List<EditableVoxelModel>();
 			VoxDocumentDiamentions? lastDiamentions = null;
 
 			// Find and construct VoxelModels from the model.
@@ -135,7 +135,7 @@ namespace Fydar.Vox.VoxFiles
 
 						if (lastDiamentions != null)
 						{
-							models.Add(new VoxelModel(scene, lastDiamentions.Value, chunkXYZI.Voxels));
+							models.Add(new EditableVoxelModel(scene, lastDiamentions.Value, chunkXYZI.Voxels));
 						}
 						else
 						{
