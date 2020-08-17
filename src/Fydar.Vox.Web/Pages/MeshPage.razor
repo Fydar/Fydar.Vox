@@ -85,7 +85,7 @@
 				faces.Add(trans);
 			}
 		}
-		
+
 		faces.Sort((lhs, rhs) => lhs.MinZ.CompareTo(rhs.MinZ));
 
 		@foreach (var face in faces)
@@ -96,7 +96,7 @@
 			}
 
 			<polygon points="@face.V1.X,@face.V1.Y @face.V2.X,@face.V2.Y @face.V3.X,@face.V3.Y @face.V4.X,@face.V4.Y"
-						style="fill: @face.Color.ToHexString(); stroke: #000; stroke-width: 1; fill-rule: evenodd;" />
+					 style="fill: @face.Color.ToHexString(); stroke: #000; stroke-width: 1; fill-rule: evenodd;" />
 		}
 	}
 </svg>

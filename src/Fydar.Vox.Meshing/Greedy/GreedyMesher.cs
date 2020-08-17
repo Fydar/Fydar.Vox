@@ -27,6 +27,40 @@ namespace Fydar.Vox.Meshing.Greedy
 					return lhs.Position.x.CompareTo(rhs.Position.x);
 				});
 
+				void AddFaceAndMergeVertically(GreedySurfaceFace faceToAdd)
+				{
+					bool didChainVertically = false;
+					// Iterate over every previously chained face
+					for (int j = outputFacesBuffer.Count - 1; j >= 0; j--)
+					{
+						var previousChainedFace = outputFacesBuffer[j];
+
+						if (previousChainedFace.ConnectsWithY(faceToAdd))
+						{
+							previousChainedFace = new GreedySurfaceFace()
+							{
+								Position = previousChainedFace.Position,
+								Scale = previousChainedFace.Scale + new Vector2SByte(0, faceToAdd.Scale.y)
+							};
+
+							didChainVertically = true;
+							outputFacesBuffer[j] = previousChainedFace;
+							break;
+						}
+
+						// If the previous face is further away than the last row that we
+						// previously procesed, stop searching.
+						if (faceToAdd.Position.y == previousChainedFace.Position.y - 2)
+						{
+							break;
+						}
+					}
+					if (!didChainVertically)
+					{
+						outputFacesBuffer.Add(faceToAdd);
+					}
+				}
+
 				GreedySurfaceFace? chainLastNull = null;
 				for (int i = 0; i < sortedBuffer.Count; i++)
 				{
@@ -53,37 +87,7 @@ namespace Fydar.Vox.Meshing.Greedy
 						}
 						else
 						{
-							bool didChainVertically = false;
-							// Iterate over every previously chained face
-							for (int j = outputFacesBuffer.Count - 1; j >= 0; j--)
-							{
-								var previousChainedFace = outputFacesBuffer[j];
-
-								if (previousChainedFace.ConnectsWithY(chainedFace))
-								{
-									previousChainedFace = new GreedySurfaceFace()
-									{
-										Position = previousChainedFace.Position,
-										Scale = previousChainedFace.Scale + new Vector2SByte(0, chainedFace.Scale.y)
-									};
-
-									didChainVertically = true;
-									outputFacesBuffer[j] = previousChainedFace;
-									break;
-								}
-
-								// If the previous face is further away than the last row that we
-								// previously procesed, stop searching.
-								if (chainedFace.Position.y == previousChainedFace.Position.y - 2)
-								{
-									break;
-								}
-							}
-
-							if (!didChainVertically)
-							{
-								outputFacesBuffer.Add(chainedFace);
-							}
+							AddFaceAndMergeVertically(chainedFace);
 
 							chainLastNull = new GreedySurfaceFace()
 							{
@@ -95,7 +99,7 @@ namespace Fydar.Vox.Meshing.Greedy
 				}
 				if (chainLastNull != null)
 				{
-					outputFacesBuffer.Add(chainLastNull.Value);
+					AddFaceAndMergeVertically(chainLastNull.Value);
 				}
 				outputSurfaces.Add(new GreedySurface()
 				{
