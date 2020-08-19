@@ -13,12 +13,15 @@
 
 	var cameraRotation = Matrix4x4.CreateRotationY(DegToRad(Direction + 180))
 		* Matrix4x4.CreateRotationX(DegToRad(Pitch));
-	var cameraRotationVector = Vector3.Transform(new Vector3(0.0f, 0.0f, 1.0f), cameraRotation);
 	var view = cameraRotation * Matrix4x4.CreateTranslation(new Vector3(0.0f, 0.0f, Distance));
 
 	var projection = Matrix4x4.CreatePerspectiveFieldOfView(DegToRad(FoV), 1.0f, 1.0f, 5000000.0f);
 
 	var matrix = world * view * projection;
+
+
+	var cameraRotationVector = Vector3.Transform(Vector3.UnitZ, Quaternion.CreateFromYawPitchRoll(DegToRad(Direction + 180), DegToRad(Pitch), 0));
+	cameraRotationVector = new Vector3(cameraRotationVector.X, -cameraRotationVector.Y, cameraRotationVector.Z);
 }
 
 @{
