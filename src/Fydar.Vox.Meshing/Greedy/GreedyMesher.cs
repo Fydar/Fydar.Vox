@@ -6,12 +6,13 @@ namespace Fydar.Vox.Meshing.Greedy
 	{
 		public GreedyMesh Optimize(GroupedMesh mesh)
 		{
-			var outputSurfaces = new List<GreedySurface>();
+			var outputSurfaces = new GreedySurface[mesh.Surfaces.Length];
 			var sortedBuffer = new List<GroupedSurfaceFace>();
 			var outputFacesBuffer = new List<GreedySurfaceFace>();
 
-			foreach (var surface in mesh.Surfaces)
+			for (int surfaceIndex = 0; surfaceIndex < mesh.Surfaces.Length; surfaceIndex++)
 			{
+				var surface = mesh.Surfaces[surfaceIndex];
 				sortedBuffer.Clear();
 				outputFacesBuffer.Clear();
 
@@ -19,12 +20,9 @@ namespace Fydar.Vox.Meshing.Greedy
 
 				sortedBuffer.Sort((lhs, rhs) =>
 				{
-					if (lhs.Position.y != rhs.Position.y)
-					{
-						return lhs.Position.y.CompareTo(rhs.Position.y);
-					}
-
-					return lhs.Position.x.CompareTo(rhs.Position.x);
+					return lhs.Position.y != rhs.Position.y
+					  ? lhs.Position.y.CompareTo(rhs.Position.y)
+					  : lhs.Position.x.CompareTo(rhs.Position.x);
 				});
 
 				void AddFaceAndMergeVertically(GreedySurfaceFace faceToAdd)
@@ -101,16 +99,16 @@ namespace Fydar.Vox.Meshing.Greedy
 				{
 					AddFaceAndMergeVertically(chainLastNull.Value);
 				}
-				outputSurfaces.Add(new GreedySurface()
+				outputSurfaces[surfaceIndex] = new GreedySurface()
 				{
 					Description = surface.Description,
 					Faces = outputFacesBuffer.ToArray()
-				});
+				};
 			}
 
 			return new GreedyMesh()
 			{
-				Surfaces = outputSurfaces.ToArray()
+				Surfaces = outputSurfaces
 			};
 		}
 	}

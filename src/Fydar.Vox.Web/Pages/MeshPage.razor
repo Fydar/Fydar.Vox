@@ -11,8 +11,9 @@
 	var world = Matrix4x4.CreateScale(1.0f)
 		* Matrix4x4.CreateTranslation(PositionX, PositionY, PositionZ);
 
-	var cameraRotation = Matrix4x4.CreateRotationY(DegToRad(RotationY + 180))
-		* Matrix4x4.CreateRotationX(DegToRad(RotationX));
+	var cameraRotation = Matrix4x4.CreateRotationY(DegToRad(Direction + 180))
+		* Matrix4x4.CreateRotationX(DegToRad(Pitch));
+	var cameraRotationVector = Vector3.Transform(new Vector3(0.0f, 0.0f, 1.0f), cameraRotation);
 	var view = cameraRotation * Matrix4x4.CreateTranslation(new Vector3(0.0f, 0.0f, Distance));
 
 	var projection = Matrix4x4.CreatePerspectiveFieldOfView(DegToRad(FoV), 1.0f, 1.0f, 5000000.0f);
@@ -38,12 +39,22 @@
 		}
 	}
 }
+<p>
+	@cameraRotationVector.X.ToString("0.00"), @cameraRotationVector.Y.ToString("0.00"), @cameraRotationVector.Z.ToString("0.00")
+</p>
 
 <svg width="620" height="620" style="border: 1px solid #eee">
 	@if (mesh != null)
 	{
 		@foreach (var group in mesh.Surfaces)
 		{
+			var faceVector = group.Description.Normal.ToVector();
+			var faceVector3 = new Vector3(-faceVector.x, faceVector.y, faceVector.z);
+			if (Vector3.Dot(cameraRotationVector, faceVector3) > 0.0f)
+			{
+				continue;
+			}
+
 			@foreach (var face in group.TransformedFaces)
 			{
 				var v1 = new Vector4(face.TopLeft.x, face.TopLeft.y, face.TopLeft.z, 1.0f);
@@ -86,7 +97,7 @@
 			}
 		}
 
-		faces.Sort((lhs, rhs) => lhs.MinZ.CompareTo(rhs.MinZ));
+		faces.Sort((lhs, rhs) => lhs.Average.Z.CompareTo(rhs.Average.Z));
 
 		@foreach (var face in faces)
 		{
@@ -133,14 +144,14 @@
 
 <div class="input-group">
 	<div style="width: 96px; font-weight: bold;">Pitch</div>
-	<div style="width: 64px;">@RotationX</div>
-	<input type="range" style="flex-grow: 1" min="-90" max="90" step="0.1" @bind="@RotationX" @bind:event="oninput" />
+	<div style="width: 64px;">@Pitch</div>
+	<input type="range" style="flex-grow: 1" min="-90" max="90" step="0.1" @bind="@Pitch" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
 	<div style="width: 96px; font-weight: bold;">Direction</div>
-	<div style="width: 64px;">@RotationY</div>
-	<input type="range" style="flex-grow: 1" min="-179" max="179" step="0.1" @bind="@RotationY" @bind:event="oninput" />
+	<div style="width: 64px;">@Direction</div>
+	<input type="range" style="flex-grow: 1" min="-179" max="179" step="0.1" @bind="@Direction" @bind:event="oninput" />
 </div>
 
 @code {
@@ -153,8 +164,8 @@
 	private float Distance = 20.0f;
 	private float FoV = 60.0f;
 
-	private float RotationX = -33.0f;
-	private float RotationY = 45.0f;
+	private float Pitch = -33.0f;
+	private float Direction = 45.0f;
 
 	protected override async Task OnInitializedAsync()
 	{
