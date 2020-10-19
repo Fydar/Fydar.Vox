@@ -17,6 +17,21 @@
 			return chunk;
 		}
 
+		public bool TryRead(VoxStructureChunk chunk, out TChunk model)
+		{
+			if (!CanImport(chunk.NameToString()))
+			{
+				model = default;
+				return false;
+			}
+
+			int offset = chunk.ContentStartIndex;
+			model = new TChunk();
+			model.Initialise(chunk.Document, ref offset);
+
+			return true;
+		}
+
 		public bool CanImport(string tag)
 		{
 			return tag == Name;

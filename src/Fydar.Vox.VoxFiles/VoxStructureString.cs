@@ -26,14 +26,6 @@ namespace Fydar.Vox.VoxFiles
 			}
 		}
 
-		public ReadOnlySpan<byte> StringBytes
-		{
-			get
-			{
-				return document.Content.AsSpan(startIndex + 4, StringLength);
-			}
-		}
-
 		public override string ToString()
 		{
 			return Encoding.ASCII.GetString(document.Content, startIndex + 4, StringLength);
