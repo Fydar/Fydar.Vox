@@ -26,22 +26,7 @@ namespace Fydar.Vox.VoxFiles
 		public int ChildrenSize => BitConverter.ToInt32(document.Content, startIndex + 8);
 
 		public int ContentStartIndex => startIndex + 12;
-
-		public ReadOnlySpan<byte> Content
-		{
-			get
-			{
-				return document.Content.AsSpan(startIndex + 12, ContentSize);
-			}
-		}
-
-		public ReadOnlySpan<byte> NameBytes
-		{
-			get
-			{
-				return document.Content.AsSpan().Slice(startIndex, 4);
-			}
-		}
+		public VoxDocument Document => document;
 
 		public IEnumerable<VoxStructureChunk> Children
 		{

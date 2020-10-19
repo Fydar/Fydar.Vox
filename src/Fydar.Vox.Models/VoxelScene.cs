@@ -112,7 +112,6 @@ namespace Fydar.Vox.VoxFiles
 			// Find and construct VoxelModels from the model.
 			foreach (var chunk in document.Main.Children)
 			{
-				var content = chunk.Content;
 				int offset = chunk.ContentStartIndex;
 
 				switch (chunk.NameToString())
