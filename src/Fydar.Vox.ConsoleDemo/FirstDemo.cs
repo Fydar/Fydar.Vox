@@ -17,7 +17,7 @@ namespace Fydar.Voxelizer.Demo
 
 
 
-			var voxelizer = new FaceGrouper(new DonutDataVoxelizer());
+			var voxelizer = new GroupedMesher(new DonutDataVoxelizer());
 			var grouped = voxelizer.Voxelize();
 
 			var greedyMesher = new GreedyMesher();

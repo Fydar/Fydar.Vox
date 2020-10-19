@@ -42,7 +42,7 @@ namespace Fydar.Vox.Voxeliser.UnitTests
 				new Vector3SByte(-1, -1, -1),
 			})
 			{
-				var cube = new FaceGrouper(new CubeVoxelDriver(offset)).Voxelize();
+				var cube = new GroupedMesher(new CubeVoxelDriver(offset)).Voxelize();
 
 				foreach (var surface in cube.Surfaces)
 				{
