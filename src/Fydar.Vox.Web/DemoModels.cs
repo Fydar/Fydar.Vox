@@ -14,7 +14,7 @@ namespace Fydar.Vox.Web
 
 		public DemoModel(DataVoxelizerDriver voxelDriver)
 		{
-			var voxelizer = new FaceGrouper(voxelDriver);
+			var voxelizer = new GroupedMesher(voxelDriver);
 			Grouped = voxelizer.Voxelize();
 			Greedy = new GreedyMesher().Optimize(Grouped);
 		}

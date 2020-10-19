@@ -2,7 +2,7 @@
 
 namespace Fydar.Vox.Meshing
 {
-	public sealed class FaceGrouper
+	public sealed class GroupedMesher
 	{
 		private struct SinglePassOverallocaingBuffer : IDriverBuffer
 		{
@@ -64,7 +64,7 @@ namespace Fydar.Vox.Meshing
 
 		public DataVoxelizerDriver Driver { get; }
 
-		public FaceGrouper(DataVoxelizerDriver driver)
+		public GroupedMesher(DataVoxelizerDriver driver)
 		{
 			Driver = driver;
 		}
