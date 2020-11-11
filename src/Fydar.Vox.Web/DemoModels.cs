@@ -33,12 +33,22 @@ namespace Fydar.Vox.Web
 
 			Models.Add(new DemoModel(new DonutDataVoxelizer()));
 
-			var response = await client.GetAsync("sample-data/demo-scene.vox");
-			var document = new VoxDocument(await response.Content.ReadAsByteArrayAsync());
-			var scene = new VoxelScene(document);
-			foreach (var model in scene.Models)
+			foreach (string path in new string[]
 			{
-				Models.Add(new DemoModel(new ImporterVoxeliser(model)));
+				"sample-data/demo-scene.vox",
+				"sample-data/box.vox",
+				"sample-data/bag.vox",
+				"sample-data/node.vox",
+				"sample-data/sniper.vox"
+			})
+			{
+				var response = await client.GetAsync(path);
+				var document = new VoxDocument(await response.Content.ReadAsByteArrayAsync());
+				var scene = new VoxelScene(document);
+				foreach (var model in scene.Models)
+				{
+					Models.Add(new DemoModel(new ImporterVoxeliser(model)));
+				}
 			}
 		}
 
