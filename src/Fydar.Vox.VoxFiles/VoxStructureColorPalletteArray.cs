@@ -9,13 +9,7 @@ namespace Fydar.Vox.VoxFiles
 
 		VoxDocument IVoxDocumentStructure.Document { get => document; set => document = value; }
 		int IVoxDocumentStructure.StartIndex { get => startIndex; set => startIndex = value; }
-		int IVoxDocumentStructure.Length
-		{
-			get
-			{
-				return 256 * 4;
-			}
-		}
+		int IVoxDocumentStructure.Length => 256 * 4;
 
 		public int Count
 		{

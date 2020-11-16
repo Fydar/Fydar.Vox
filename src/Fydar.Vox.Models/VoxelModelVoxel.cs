@@ -6,13 +6,7 @@
 
 		public byte Index { get; set; }
 
-		public bool IsEmpty
-		{
-			get
-			{
-				return Index == 0;
-			}
-		}
+		public bool IsEmpty => Index == 0;
 
 		public override string ToString()
 		{

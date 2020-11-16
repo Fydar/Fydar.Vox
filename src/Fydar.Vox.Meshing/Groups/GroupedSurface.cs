@@ -68,7 +68,7 @@ namespace Fydar.Vox.Meshing
 					yield return new GroupedSurfaceTransformedFace()
 					{
 						TopLeft = tl,
-						TopRight = tr, 
+						TopRight = tr,
 						BottomLeft = bl,
 						BottomRight = br
 					};

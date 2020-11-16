@@ -10,21 +10,29 @@
 		public Vector2SByte BottomRight => Position + new Vector2SByte(Scale.x, 0);
 		public Vector2SByte BottomLeft => Position;
 
-		public bool ConnectsWithY(GreedySurfaceFace other) =>
-			TopLeft == other.BottomLeft && 
-			TopRight == other.BottomRight;
+		public bool ConnectsWithY(GreedySurfaceFace other)
+		{
+			return TopLeft == other.BottomLeft &&
+TopRight == other.BottomRight;
+		}
 
-		public bool ConnectsWithX(GreedySurfaceFace other) =>
-			TopLeft == other.BottomLeft && 
-			TopRight == other.BottomRight;
+		public bool ConnectsWithX(GreedySurfaceFace other)
+		{
+			return TopLeft == other.BottomLeft &&
+TopRight == other.BottomRight;
+		}
 
-		public bool ConnectsWithY(GroupedSurfaceFace other) => 
-			TopLeft == other.BottomLeft && 
-			TopRight == other.BottomRight;
+		public bool ConnectsWithY(GroupedSurfaceFace other)
+		{
+			return TopLeft == other.BottomLeft &&
+TopRight == other.BottomRight;
+		}
 
-		public bool ConnectsWithX(GroupedSurfaceFace other) =>
-			TopRight == other.TopLeft &&
-			BottomRight == other.BottomLeft;
+		public bool ConnectsWithX(GroupedSurfaceFace other)
+		{
+			return TopRight == other.TopLeft &&
+BottomRight == other.BottomLeft;
+		}
 
 		public override string ToString()
 		{
