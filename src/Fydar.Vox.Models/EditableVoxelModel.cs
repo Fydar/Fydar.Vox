@@ -8,14 +8,21 @@
 
 		public VoxelModelVoxel[,,] Voxels { get; set; }
 
-		public override VoxelModelVoxel this[int x, int y, int z]
+		public override VoxelModelVoxel GetWithRangeCheck(int x, int y, int z)
 		{
-			get
-			{
-				return x < 0 || y < 0 || z < 0 || x >= Width || y >= Depth || z >= Height
-					? VoxelModelVoxel.Empty
-					: Voxels[x, y, z];
-			}
+			return x < 0 || y < 0 || z < 0 || x >= Width || y >= Depth || z >= Height
+				? VoxelModelVoxel.Empty
+				: Voxels[x, y, z];
+		}
+
+		public EditableVoxelModel(VoxelScene voxelScene, int width, int height, int depth)
+			: base(voxelScene)
+		{
+			Width = width;
+			Height = height;
+			Depth = depth;
+
+			Voxels = new VoxelModelVoxel[Width, Depth, Height];
 		}
 
 		public EditableVoxelModel(VoxelScene voxelScene, VoxDocumentDiamentions diamentions, VoxStructureVoxelArray voxDocumentVoxels)

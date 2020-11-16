@@ -30,7 +30,7 @@
 			{
 				var colour = new VoxDocumentColour(defaultPalette[i]);
 
-				colours[i + 1] = colour;
+				colours[i] = colour;
 			}
 
 			return new VoxelColourPallette()

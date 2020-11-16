@@ -12,6 +12,14 @@ namespace Fydar.Vox.VoxFiles
 		public VoxelLayer[] Layers { get; set; }
 		public VoxelNode Root { get; set; }
 
+		public VoxelScene()
+		{
+			Layers = new VoxelLayer[]
+			{
+				new VoxelLayer(0)
+			};
+		}
+
 		public VoxelScene(VoxDocument document)
 		{
 			Pallette = LoadPallette(document);
