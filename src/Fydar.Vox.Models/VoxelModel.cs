@@ -13,7 +13,7 @@ namespace Fydar.Vox.VoxFiles
 		public abstract int Depth { get; }
 		public abstract int Height { get; }
 
-		public abstract VoxelModelVoxel this[int x, int y, int z] { get; }
+		public abstract VoxelModelVoxel GetWithRangeCheck(int x, int y, int z);
 
 		public VoxelModel(VoxelScene voxelScene)
 		{
