@@ -5,33 +5,40 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Fydar.Vox.Web
+namespace Fydar.Vox.WebDemo
 {
 	public struct DemoModel
 	{
+		public VoxelModel Model;
 		public GroupedMesh Grouped;
 		public GreedyMesh Greedy;
 
-		public DemoModel(DataVoxelizerDriver voxelDriver)
+		public DemoModel(DataVoxelizerDriver voxelDriver, VoxelModel model = null)
 		{
 			var voxelizer = new GroupedMesher(voxelDriver);
 			Grouped = voxelizer.Voxelize();
 			Greedy = new GreedyMesher().Optimize(Grouped);
+
+			Model = model;
 		}
 	}
 
 	public static class DemoModels
 	{
-		public static List<DemoModel> Models = new List<DemoModel>();
+		public static readonly List<DemoModel> Models = new();
 
 		public static async Task Init(HttpClient client)
 		{
+			Models.Clear();
+
+			/*
 			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(0, 0, 0))));
 			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(0, 2, 0))));
 			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(2, 0, 0))));
 			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(0, 0, 2))));
 
 			Models.Add(new DemoModel(new DonutDataVoxelizer()));
+			*/
 
 			foreach (string path in new string[]
 			{
@@ -47,7 +54,7 @@ namespace Fydar.Vox.Web
 				var scene = new VoxelScene(document);
 				foreach (var model in scene.Models)
 				{
-					Models.Add(new DemoModel(new ImporterVoxeliser(model)));
+					Models.Add(new DemoModel(new ImporterVoxeliser(model), model));
 				}
 			}
 		}

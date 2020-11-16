@@ -21,6 +21,7 @@
 		position: relative;
 		width: 250px;
 		height: 500px;
+		margin: auto;
 		transform-style: preserve-3d;
 		transition: transform 0.6s;
 	}
@@ -29,7 +30,7 @@
 		transform-origin: 0% 0%;
 	}
 
-	.face {
+	.surface div {
 		position: absolute;
 		width: @(faceSize)px;
 		height: @(faceSize)px;
@@ -38,37 +39,51 @@
 </style>
 
 <div class="scene">
-
 	@{
-		GroupedMesh? mesh = null;
-		if (DemoModels.Models != null)
+		GreedyMesh? mesh = null;
+		int width = 1;
+		int height = 1;
+		int depth = 1;
+
+		if (DemoModels.Models != null && Model < DemoModels.Models.Count)
 		{
-			if (DemoModels.Models[Model].Grouped.Surfaces != null)
+			var model = DemoModels.Models[Model];
+			if (model.Grouped.Surfaces != null)
 			{
-				mesh = DemoModels.Models[Model].Grouped;
+				mesh = model.Greedy;
+				width = model.Model.Width;
+				height = model.Model.Height;
+				depth = model.Model.Depth;
 			}
 		}
 	}
 
-
 	@if (mesh != null)
 	{
-	<div class="mesh" style="width: @(faceSize * Width)px; height: @(faceSize * Height)px; transform: scale(@scale) scaleY(-1) rotateX(@(Pitch)deg) rotateY(@(Direction)deg) translate3d(0, 0, @(faceSize * (Depth - 1) * -0.5f)px) ">
+		<div class="mesh" style="width: 512px; height: 512px; transform: scale(@Scale) scaleY(-1) rotateX(@(Pitch)deg) rotateY(@(Direction)deg) translate3d(@(faceSize * (width - 1) * -0.5f)px, 0, @(faceSize * (depth - 1) * -0.5f)px) ">
 
-		@foreach (var surfaces in mesh.Value.Surfaces)
-		{
-			<div class="surface" style="transform: @ToTransform(surfaces.Description)">
-				@foreach (var face in surfaces.Faces)
-				{
-					<div class="face" style="
-									transform: translate(@(face.Position.x * faceSize)px, @(face.Position.y * faceSize)px);
-									background-color: @surfaces.Description.Colour.ToHexString();">
+			@foreach (var surfaceGroup in mesh.Value.Surfaces.GroupBy(surf => new SurfaceDescription()
+			{
+				Normal = surf.Description.Normal,
+				Depth = surf.Description.Depth
+			}))
+			{
+				<div class="surface" style="transform: @ToTransform(surfaceGroup.Key)">
+					@foreach (var surface in surfaceGroup)
+					{
+						@foreach (var face in surface.Faces)
+						{
+							<div class="face" style="width: @(face.Scale.x * faceSize)px;
+										height: @(face.Scale.y * faceSize)px;
+										transform: translate(@(face.Position.x * faceSize)px, @(face.Position.y * faceSize)px);
+										background-color: @surface.Description.Colour.ToHexString();">
 
-					</div>
-				}
-			</div>
-		}
-	</div>
+							</div>
+						}
+					}
+				</div>
+			}
+		</div>
 	}
 </div>
 
@@ -76,24 +91,6 @@
 	<div style="width: 96px; font-weight: bold;">Model</div>
 	<div style="width: 64px;">@Model</div>
 	<input type="range" style="flex-grow: 1" min="0" max="@(DemoModels.Models?.Count - 1 ?? 0)" @bind="@Model" @bind:event="oninput" />
-</div>
-
-<div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Width</div>
-	<div style="width: 64px;">@Width</div>
-	<input type="range" style="flex-grow: 1" min="0" max="25" @bind="@Width" @bind:event="oninput" />
-</div>
-
-<div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Height</div>
-	<div style="width: 64px;">@Height</div>
-	<input type="range" style="flex-grow: 1" min="0" max="25" @bind="@Height" @bind:event="oninput" />
-</div>
-
-<div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Depth</div>
-	<div style="width: 64px;">@Depth</div>
-	<input type="range" style="flex-grow: 1" min="0" max="25" @bind="@Depth" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
@@ -108,23 +105,25 @@
 	<input type="range" style="flex-grow: 1" min="-90" max="90" @bind="@Pitch" @bind:event="oninput" />
 </div>
 
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Scale</div>
+	<div style="width: 64px;">@Scale</div>
+	<input type="range" style="flex-grow: 1" min="0.01" max="1" step="0.01" @bind="@Scale" @bind:event="oninput" />
+</div>
+
 @code {
-		static int faceSize = 50;
-		static float scale = 0.5f;
+	static int faceSize = 50;
+	private float Scale = 0.5f;
 
-		private int Model = 0;
+	private int Model = 0;
 
-		private int Width = 6;
-		private int Height = 10;
-		private int Depth = 6;
+	private float Pitch = 45.0f;
+	private float Direction = 30.0f;
 
-		private float Pitch = 45.0f;
-		private float Direction = 30.0f;
-
-		protected override async Task OnInitializedAsync()
-		{
-			await DemoModels.Init(Http);
-		}
+	protected override async Task OnInitializedAsync()
+	{
+		await DemoModels.Init(Http);
+	}
 }
 
 @functions {
