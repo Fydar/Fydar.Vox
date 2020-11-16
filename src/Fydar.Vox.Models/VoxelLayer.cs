@@ -8,15 +8,9 @@ namespace Fydar.Vox.VoxFiles
 		public Dictionary<string, string> LayerAttributes { get; set; }
 		public int ReservedId { get; set; }
 
-		public bool Hidden
-		{
-			get
-			{
-				return LayerAttributes.TryGetValue("_hidden", out string name)
+		public bool Hidden => LayerAttributes.TryGetValue("_hidden", out string name)
 					? name == "1"
 					: false;
-			}
-		}
 
 		public VoxelLayer(int layerId, IEnumerable<KeyValuePair<string, string>> tags = null)
 		{

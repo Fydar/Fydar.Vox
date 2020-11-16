@@ -4,13 +4,7 @@ namespace Fydar.Vox.Meshing
 {
 	public struct FaceEdgeFlags : IEquatable<FaceEdgeFlags>
 	{
-		public static FaceEdgeFlags None
-		{
-			get
-			{
-				return new FaceEdgeFlags();
-			}
-		}
+		public static FaceEdgeFlags None => new FaceEdgeFlags();
 
 		private static readonly string[] iconography = new string[]
 		{
@@ -58,33 +52,21 @@ namespace Fydar.Vox.Meshing
 			set => SetBit(ref data, 3, value);
 		}
 
-		public FaceCornerFlags Corners
+		public FaceCornerFlags Corners => new FaceCornerFlags()
 		{
-			get
-			{
-				return new FaceCornerFlags()
-				{
-					TopLeft = Top || Left,
-					TopRight = Top || Right,
-					BottomLeft = Bottom || Left,
-					BottomRight = Bottom || Right,
-				};
-			}
-		}
+			TopLeft = Top || Left,
+			TopRight = Top || Right,
+			BottomLeft = Bottom || Left,
+			BottomRight = Bottom || Right,
+		};
 
-		public FaceCornerFlags OverlappingCorners
+		public FaceCornerFlags OverlappingCorners => new FaceCornerFlags()
 		{
-			get
-			{
-				return new FaceCornerFlags()
-				{
-					TopLeft = Top && Left,
-					TopRight = Top && Right,
-					BottomLeft = Bottom && Left,
-					BottomRight = Bottom && Right,
-				};
-			}
-		}
+			TopLeft = Top && Left,
+			TopRight = Top && Right,
+			BottomLeft = Bottom && Left,
+			BottomRight = Bottom && Right,
+		};
 
 		public override string ToString()
 		{

@@ -14,13 +14,7 @@ namespace Fydar.Vox.VoxFiles
 
 		VoxDocument IVoxDocumentStructure.Document { get => document; set => document = value; }
 		int IVoxDocumentStructure.StartIndex { get => startIndex; set => startIndex = value; }
-		int IVoxDocumentStructure.Length
-		{
-			get
-			{
-				return 12 + ContentSize + ChildrenSize;
-			}
-		}
+		int IVoxDocumentStructure.Length => 12 + ContentSize + ChildrenSize;
 
 		public int ContentSize => BitConverter.ToInt32(document.Content, startIndex + 4);
 		public int ChildrenSize => BitConverter.ToInt32(document.Content, startIndex + 8);

@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Fydar.Vox.VoxFiles
+﻿namespace Fydar.Vox.VoxFiles
 {
 	public struct VoxChunkSIZE : IVoxChunk
 	{
