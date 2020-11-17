@@ -8,83 +8,96 @@
 
 <h1>Static Render</h1>
 
-<style>
-	.scene {
-		display: inline-block;
-		padding: 50px;
-		perspective: 2048px;
-		border: 1px solid #eee;
-		overflow: hidden;
-	}
+<div style="min-height: 720px">
 
-	.mesh {
-		position: relative;
-		width: 250px;
-		height: 500px;
-		margin: auto;
-		transform-style: preserve-3d;
-		transition: transform 0.6s;
-	}
-
-	.surface {
-		transform-origin: 0% 0%;
-	}
-
-	.surface div {
-		position: absolute;
-		width: @(faceSize)px;
-		height: @(faceSize)px;
-		border: 1px solid #0006;
-	}
-</style>
-
-<div class="scene">
-	@{
-		GreedyMesh? mesh = null;
-		int width = 1;
-		int height = 1;
-		int depth = 1;
-
-		if (DemoModels.Models != null && Model < DemoModels.Models.Count)
-		{
-			var model = DemoModels.Models[Model];
-			if (model.Grouped.Surfaces != null)
-			{
-				mesh = model.Greedy;
-				width = model.Model.Width;
-				height = model.Model.Height;
-				depth = model.Model.Depth;
-			}
+	<style>
+		.scene {
+			display: inline-block;
+			perspective: 2048px;
+			overflow: hidden;
+			box-sizing: border-box;
 		}
-	}
 
-	@if (mesh != null)
-	{
-		<div class="mesh" style="width: 512px; height: 512px; transform: scale(@Scale) scaleY(-1) rotateX(@(Pitch)deg) rotateY(@(Direction)deg) translate3d(@(faceSize * (width - 1) * -0.5f)px, 0, @(faceSize * (depth - 1) * -0.5f)px) ">
+			.scene .mesh {
+				position: relative;
+				margin: auto;
+				transform-style: preserve-3d;
+				transition: transform 0.6s;
+			}
 
-			@foreach (var surfaceGroup in mesh.Value.Surfaces.GroupBy(surf => new SurfaceDescription()
-			{
-				Normal = surf.Description.Normal,
-				Depth = surf.Description.Depth
-			}))
-			{
-				<div class="surface" style="transform: @ToTransform(surfaceGroup.Key)">
-					@foreach (var surface in surfaceGroup)
+				.scene .mesh .element {
+					transform-style: preserve-3d;
+				}
+
+				.scene .mesh .surface {
+					transform-origin: 0% 0%;
+				}
+
+					.scene .mesh .surface div {
+						position: absolute;
+						-webkit-backface-visibility: hidden;
+						backface-visibility: hidden;
+						-webkit-background-clip: content-box;
+						background-clip: content-box;
+						outline: 1px solid transparent;
+					}
+	</style>
+
+	<div class="scene" style="padding: 50px 30px 50px 30px;">
+		@{
+				GreedyMesh? mesh = null;
+				int width = 1;
+				int height = 1;
+				int depth = 1;
+
+				if (DemoModels.Models != null && Model < DemoModels.Models.Count)
+				{
+					var model = DemoModels.Models[Model];
+					if (model.Grouped.Surfaces != null)
 					{
-						@foreach (var face in surface.Faces)
-						{
-							<div class="face" style="width: @(face.Scale.x * faceSize)px;
-										height: @(face.Scale.y * faceSize)px;
-										transform: translate(@(face.Position.x * faceSize)px, @(face.Position.y * faceSize)px);
+						mesh = model.Greedy;
+						width = model.Model.Width;
+						height = model.Model.Height;
+						depth = model.Model.Depth;
+					}
+				}
+
+				if (UseDesiredWidth)
+				{
+					FaceSize = (int)DesiredWidth / width;
+				}
+		}
+
+		@if (mesh != null)
+		{
+			<div class="mesh" style="width: @(FaceSize * width)px; height: @(FaceSize * height)px; transform: rotateX(@(Pitch)deg) rotateY(@(Direction)deg)">
+				<div class="element" style="transform: scale3d(@Scale, -@Scale, @Scale) translate3d(0, @(((FaceSize * height * -1.0f)))px, @(FaceSize * (depth) * -0.5f)px)">
+					@foreach (var surfaceGroup in mesh.Value.Surfaces.GroupBy(surf => new SurfaceDescription()
+					{
+						Normal = surf.Description.Normal,
+						Depth = surf.Description.Depth
+					}))
+					{
+						<div class="surface" style="transform: @ToTransform(surfaceGroup.Key)">
+							@foreach (var surface in surfaceGroup)
+							{
+								@foreach (var face in surface.Faces)
+								{
+									<div class="face" style="width: @(face.Scale.x * FaceSize)px;
+										height: @(face.Scale.y * FaceSize)px;
+										transform: translate(@(face.Position.x * FaceSize)px, @(face.Position.y * FaceSize)px);
 										background-color: @surface.Description.Colour.ToHexString();">
 
-							</div>
-						}
+									</div>
+								}
+							}
+						</div>
 					}
 				</div>
-			}
-		</div>
-	}
+			</div>
+		}
+	</div>
+
 </div>
 
 <div class="input-group">
@@ -111,14 +124,29 @@
 	<input type="range" style="flex-grow: 1" min="0.01" max="1" step="0.01" @bind="@Scale" @bind:event="oninput" />
 </div>
 
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Use Desired Width</div>
+	<div style="width: 64px;">@UseDesiredWidth</div>
+	<input type="checkbox" style="flex-grow: 1" @bind="@UseDesiredWidth" @bind:event="oninput" />
+</div>
+
+<div class="input-group">
+	<div style="width: 96px; font-weight: bold;">Desired Width</div>
+	<div style="width: 64px;">@DesiredWidth</div>
+	<input type="range" style="flex-grow: 1" min="50" max="1000" step="10" @bind="@DesiredWidth" @bind:event="oninput" />
+</div>
+
 @code {
-	static int faceSize = 50;
-	private float Scale = 0.5f;
+	private int FaceSize = 50;
+	private float Scale = 1.0f;
 
 	private int Model = 0;
 
-	private float Pitch = 45.0f;
+	private float Pitch = -45.0f;
 	private float Direction = 30.0f;
+
+	private bool UseDesiredWidth = true;
+	private float DesiredWidth = 250;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -127,34 +155,34 @@
 }
 
 @functions {
-	public static string ToTransform(SurfaceDescription surface)
+	public string ToTransform(SurfaceDescription surface)
 	{
 		var normal = surface.Normal;
 		int depth = surface.Depth;
 
 		if (normal == VoxelNormal.Up)
 		{
-			return $"rotateX(90deg) translate3d(0, 0, {depth * -faceSize}px)";
+			return $"rotateX(90deg) translate3d(0, 0, {depth * -FaceSize}px)";
 		}
 		else if (normal == VoxelNormal.Down)
 		{
-			return $"rotateX(90deg) translate3d(0, 0, {depth * faceSize}px)";
+			return $"rotateX(90deg) translate3d(0, 0, {depth * FaceSize}px)";
 		}
 		else if (normal == VoxelNormal.Left)
 		{
-			return $"rotateY(-90deg) translate3d(0px, 0, {depth * faceSize}px)";
+			return $"rotateY(-90deg) translate3d(0px, 0, {depth * FaceSize}px)";
 		}
 		else if (normal == VoxelNormal.Right)
 		{
-			return $"rotateY(-90deg) translate3d(0px, 0, {depth * -faceSize}px)";
+			return $"rotateY(-90deg) translate3d(0px, 0, {depth * -FaceSize}px)";
 		}
 		else if (normal == VoxelNormal.Back)
 		{
-			return $"translate3d(0, 0, {depth * -faceSize}px)";
+			return $"translate3d(0, 0, {depth * -FaceSize}px)";
 		}
 		else if (normal == VoxelNormal.Forward)
 		{
-			return $"translate3d(0, 0, {depth * faceSize}px)";
+			return $"translate3d(0, 0, {depth * FaceSize}px)";
 		}
 		return "";
 	}
