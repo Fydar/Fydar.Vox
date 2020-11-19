@@ -25,11 +25,19 @@ namespace Fydar.Vox.WebDemo
 
 			foreach (string path in new string[]
 			{
-				"sample-data/demo-scene.vox",
-				"sample-data/box.vox",
 				"sample-data/bag.vox",
+				"sample-data/book-closed.vox",
+				"sample-data/book-open.vox",
+				"sample-data/box.vox",
+				"sample-data/chest-closed.vox",
+				"sample-data/helmet.vox",
 				"sample-data/node.vox",
-				"sample-data/sniper.vox"
+				"sample-data/scroll-red.vox",
+				"sample-data/swiftness-boots.vox",
+				"sample-data/sword-1.vox",
+				"sample-data/demo-scene.vox",
+				"sample-data/sniper.vox",
+				"sample-data/me.vox",
 			})
 			{
 				var response = await client.GetAsync(path);

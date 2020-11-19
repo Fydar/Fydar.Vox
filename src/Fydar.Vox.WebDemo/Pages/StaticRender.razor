@@ -8,7 +8,7 @@
 
 <h1>Static Render</h1>
 
-<div style="min-height: 720px">
+<div style="min-height: 720px; width: 100%; overflow: hidden;">
 
 	<style>
 		.scene {
@@ -125,13 +125,8 @@
 </div>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Use Desired Width</div>
-	<div style="width: 64px;">@UseDesiredWidth</div>
-	<input type="checkbox" style="flex-grow: 1" @bind="@UseDesiredWidth" @bind:event="oninput" />
-</div>
-
-<div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Desired Width</div>
+	<div style="width: 96px; font-weight: bold;">Width</div>
+	<input type="checkbox" style="width: 64px" @bind="@UseDesiredWidth" @bind:event="oninput" />
 	<div style="width: 64px;">@DesiredWidth</div>
 	<input type="range" style="flex-grow: 1" min="50" max="1000" step="10" @bind="@DesiredWidth" @bind:event="oninput" />
 </div>
@@ -146,7 +141,7 @@
 	private float Direction = 30.0f;
 
 	private bool UseDesiredWidth = true;
-	private float DesiredWidth = 250;
+	private float DesiredWidth = 140;
 
 	protected override async Task OnInitializedAsync()
 	{
