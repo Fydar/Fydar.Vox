@@ -4,6 +4,11 @@
 @using System.Numerics;
 @using Fydar.Vox.VoxFiles;
 @using System.Text.Encodings.Web;
+@using System.IO;
+@using SixLabors.ImageSharp;
+@using SixLabors.ImageSharp.PixelFormats;
+@using SixLabors.ImageSharp.Formats.Png;
+@using SixLabors.ImageSharp.Formats;
 
 @page "/staticrender"
 @inject HttpClient Http
@@ -50,6 +55,7 @@
 		@{
 			string name = "no mesh";
 			GreedyMesh? mesh = null;
+			GroupedMesh? groupedMesh = null;
 			int width = 1;
 			int height = 1;
 			int depth = 1;
@@ -61,6 +67,7 @@
 				{
 					name = model.Name;
 					mesh = model.Greedy;
+					groupedMesh = model.Grouped;
 					width = model.Model.Width;
 					height = model.Model.Height;
 					depth = model.Model.Depth;
@@ -76,14 +83,14 @@
 		@if (mesh != null)
 		{
 			<div class="mesh" style="width: @(FaceSize * width)px; height: @(FaceSize * height)px; transform: rotateX(@(Pitch)deg) rotateY(@(Direction)deg)">
-				<div class="element" style="transform: scale3d(@Scale, -@Scale, @Scale) translate3d(0, @(((FaceSize * height * -1.0f)))px, @(FaceSize * (depth) * -0.5f)px)">
-					@foreach (var surfaceGroup in mesh.Value.Surfaces.GroupBy(surf => new SurfaceDescription()
+				<div class="element" style="transform: scale3d(@Scale, -@Scale, @Scale) translate3d(0, @(FaceSize * height * -1.0f)px, @(FaceSize * depth * -0.5f)px)">
+					@foreach (var surfaceGroup in groupedMesh.Value.Surfaces.GroupBy(surf => new SurfaceDescription()
 					{
 						Normal = surf.Description.Normal,
 						Depth = surf.Description.Depth
 					}))
 					{
-						<img src="@EncodeSvg(RenderSVG(surfaceGroup))" class="surface" style="transform: @ToTransform(surfaceGroup.Key)" />
+						<img src="@RenderPNG(surfaceGroup, out int faceWidth, out int faceHeight)" width="@faceWidth" height="@faceHeight" class="surface" style="transform: @ToTransform(surfaceGroup.Key)" />
 					}
 				</div>
 			</div>
@@ -144,6 +151,43 @@
 }
 
 @functions {
+	public string RenderPNG(IGrouping<SurfaceDescription, GroupedSurface> greedySurfaces, out int width, out int height)
+	{
+		sbyte maxX = 0;
+		sbyte maxY = 0;
+
+		foreach (var surface in greedySurfaces)
+		{
+			foreach (var face in surface.Faces)
+			{
+				maxX = Math.Max(maxX, face.TopRight.x);
+				maxY = Math.Max(maxY, face.TopRight.y);
+			}
+		}
+
+		width = maxX * FaceSize;
+		height = maxY * FaceSize;
+
+		// Creates a new image with empty pixel data.
+		using (var image = new Image<Rgba32>(maxX, maxY))
+		{
+			foreach (var surface in greedySurfaces)
+			{
+				foreach (var face in surface.Faces)
+				{
+					image[face.Position.x, face.Position.y] = new Rgba32(
+						surface.Description.Colour.r,
+						surface.Description.Colour.g,
+						surface.Description.Colour.b,
+						255
+					);
+				}
+			}
+
+			return image.ToBase64String(PngFormat.Instance);
+		}
+	}
+
 	public string ToTransform(SurfaceDescription surface)
 	{
 		var normal = surface.Normal;
