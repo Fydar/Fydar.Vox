@@ -1,7 +1,9 @@
 ﻿@using Fydar.Vox.Meshing;
 @using System;
+@using System.Text;
 @using System.Numerics;
 @using Fydar.Vox.VoxFiles;
+@using System.Text.Encodings.Web;
 
 @page "/staticrender"
 @inject HttpClient Http
@@ -31,6 +33,7 @@
 
 				.scene .mesh .surface {
 					transform-origin: 0% 0%;
+					position: absolute;
 				}
 
 					.scene .mesh .surface div {
@@ -45,27 +48,29 @@
 
 	<div class="scene" style="padding: 50px 30px 50px 30px;">
 		@{
-				GreedyMesh? mesh = null;
-				int width = 1;
-				int height = 1;
-				int depth = 1;
+			string name = "no mesh";
+			GreedyMesh? mesh = null;
+			int width = 1;
+			int height = 1;
+			int depth = 1;
 
-				if (DemoModels.Models != null && Model < DemoModels.Models.Count)
+			if (DemoModels.Models != null && Model < DemoModels.Models.Count)
+			{
+				var model = DemoModels.Models[Model];
+				if (model.Grouped.Surfaces != null)
 				{
-					var model = DemoModels.Models[Model];
-					if (model.Grouped.Surfaces != null)
-					{
-						mesh = model.Greedy;
-						width = model.Model.Width;
-						height = model.Model.Height;
-						depth = model.Model.Depth;
-					}
+					name = model.Name;
+					mesh = model.Greedy;
+					width = model.Model.Width;
+					height = model.Model.Height;
+					depth = model.Model.Depth;
 				}
+			}
 
-				if (UseDesiredWidth)
-				{
-					FaceSize = (int)DesiredWidth / width;
-				}
+			if (UseDesiredWidth)
+			{
+				FaceSize = (int)DesiredWidth / width;
+			}
 		}
 
 		@if (mesh != null)
@@ -78,23 +83,12 @@
 						Depth = surf.Description.Depth
 					}))
 					{
-						<div class="surface" style="transform: @ToTransform(surfaceGroup.Key)">
-							@foreach (var surface in surfaceGroup)
-							{
-								@foreach (var face in surface.Faces)
-								{
-									<div class="face" style="width: @(face.Scale.x * FaceSize)px;
-										height: @(face.Scale.y * FaceSize)px;
-										transform: translate(@(face.Position.x * FaceSize)px, @(face.Position.y * FaceSize)px);
-										background-color: @surface.Description.Colour.ToHexString();">
-
-									</div>
-								}
-							}
-						</div>
+						<img src="@EncodeSvg(RenderSVG(surfaceGroup))" class="surface" style="transform: @ToTransform(surfaceGroup.Key)" />
 					}
 				</div>
 			</div>
+
+			<p>@name</p>
 		}
 	</div>
 
@@ -180,5 +174,78 @@
 			return $"translate3d(0, 0, {depth * FaceSize}px)";
 		}
 		return "";
+	}
+
+	public string EncodeSvg(string svg)
+	{
+		var urlEncoded = UrlEncoder.Default.Encode(svg);
+
+		return "data:image/svg+xml," + urlEncoded;
+	}
+
+	public string RenderSVG(IGrouping<SurfaceDescription, GreedySurface> greedySurfaces)
+	{
+		sbyte maxX = 0;
+		sbyte maxY = 0;
+
+		foreach (var surface in greedySurfaces)
+		{
+			foreach (var face in surface.Faces)
+			{
+				maxX = Math.Max(maxX, face.TopRight.x);
+				maxY = Math.Max(maxY, face.TopRight.y);
+			}
+		}
+
+		var sb = new StringBuilder();
+
+		sb.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" viewBox=\"0 0 ");
+
+		sb.Append(maxX * FaceSize);
+
+		sb.Append(" ");
+
+		sb.Append(maxY * FaceSize);
+
+		sb.Append("\" width=\"");
+
+		sb.Append(maxX * FaceSize);
+
+		sb.Append("\" height=\"");
+
+		sb.Append(maxY * FaceSize);
+
+		sb.Append("\">");
+
+		foreach (var surface in greedySurfaces)
+		{
+			foreach (var face in surface.Faces)
+			{
+				sb.Append("<rect x=\"");
+				sb.Append((face.Position.x * FaceSize) - 1);
+
+				sb.Append("\" y=\"");
+
+				sb.Append((face.Position.y * FaceSize) - 1);
+
+				sb.Append("\" width=\"");
+
+				sb.Append((face.Scale.x * FaceSize) + 1);
+
+				sb.Append("\" height=\"");
+
+				sb.Append((face.Scale.y * FaceSize) + 1);
+
+				sb.Append("\" style=\"fill: ");
+
+				sb.Append(surface.Description.Colour.ToHexString());
+
+				sb.Append("\" />");
+
+			}
+		}
+		sb.Append("</svg>");
+
+		return sb.ToString();
 	}
 }
