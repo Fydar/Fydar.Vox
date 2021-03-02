@@ -38,14 +38,16 @@ namespace Fydar.Vox.WebDemo
 				"sample-data/demo-scene.vox",
 				"sample-data/sniper.vox",
 				"sample-data/me.vox",
+				"sample-data/head-1.vox",
 			})
 			{
 				var response = await client.GetAsync(path);
 				var document = new VoxDocument(await response.Content.ReadAsByteArrayAsync());
 				var scene = new VoxelScene(document);
+
 				foreach (var model in scene.Models)
 				{
-					Models.Add(new DemoModel(new ImporterVoxeliser(model), model));
+					Models.Add(new DemoModel(path, new ImporterVoxeliser(model), model));
 				}
 			}
 		}

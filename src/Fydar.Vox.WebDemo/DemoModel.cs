@@ -6,12 +6,14 @@ namespace Fydar.Vox.WebDemo
 {
 	public struct DemoModel
 	{
+		public string Name;
 		public VoxelModel Model;
 		public GroupedMesh Grouped;
 		public GreedyMesh Greedy;
 
-		public DemoModel(DataVoxelizerDriver voxelDriver, VoxelModel model = null)
+		public DemoModel(string name, DataVoxelizerDriver voxelDriver, VoxelModel model = null)
 		{
+			Name = name;
 			var voxelizer = new GroupedMesher(voxelDriver);
 			Grouped = voxelizer.Voxelize();
 			Greedy = new GreedyMesher().Optimize(Grouped);
