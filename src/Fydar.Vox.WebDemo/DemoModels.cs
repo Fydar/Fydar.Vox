@@ -14,21 +14,13 @@ namespace Fydar.Vox.WebDemo
 		{
 			Models.Clear();
 
-			/*
-			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(0, 0, 0))));
-			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(0, 2, 0))));
-			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(2, 0, 0))));
-			Models.Add(new DemoModel(new CubeVoxelDriver(new Vector3SByte(0, 0, 2))));
-
-			Models.Add(new DemoModel(new DonutDataVoxelizer()));
-			*/
-
 			foreach (string path in new string[]
 			{
 				"sample-data/bag.vox",
 				"sample-data/book-closed.vox",
 				"sample-data/book-open.vox",
 				"sample-data/box.vox",
+				"sample-data/ship.vox",
 				"sample-data/chest-closed.vox",
 				"sample-data/helmet.vox",
 				"sample-data/node.vox",
@@ -39,15 +31,17 @@ namespace Fydar.Vox.WebDemo
 				"sample-data/sniper.vox",
 				"sample-data/me.vox",
 				"sample-data/head-1.vox",
+				"sample-data/deer.vox",
 			})
 			{
 				var response = await client.GetAsync(path);
 				var document = new VoxDocument(await response.Content.ReadAsByteArrayAsync());
 				var scene = new VoxelScene(document);
 
-				foreach (var model in scene.Models)
+				for (int i = 0; i < scene.Models.Length; i++)
 				{
-					Models.Add(new DemoModel(path, new ImporterVoxeliser(model), model));
+					var model = scene.Models[i];
+					Models.Add(new DemoModel($"{path} : {i}", new ImporterVoxeliser(model), model));
 				}
 			}
 		}
