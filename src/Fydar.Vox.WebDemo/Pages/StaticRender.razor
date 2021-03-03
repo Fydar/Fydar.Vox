@@ -2,16 +2,18 @@
 @using System;
 @using System.Text;
 @using System.Numerics;
-@using Fydar.Vox.VoxFiles;
 @using System.Text.Encodings.Web;
-@using System.IO;
-@using SixLabors.ImageSharp;
-@using SixLabors.ImageSharp.PixelFormats;
-@using SixLabors.ImageSharp.Formats.Png;
-@using SixLabors.ImageSharp.Formats;
 
 @page "/staticrender"
 @inject HttpClient Http
+
+@{
+	DemoModel? model = null;
+	if (DemoModels.Models != null && Model < DemoModels.Models.Count)
+	{
+		model = DemoModels.Models[Model];
+	}
+}
 
 <h1>Static Render</h1>
 
@@ -20,9 +22,11 @@
 	<style>
 		.scene {
 			display: inline-block;
-			perspective: 2048px;
 			overflow: hidden;
 			box-sizing: border-box;
+			perspective: 2048px;
+			width: 100%;
+			height: 650px;
 		}
 
 			.scene .mesh {
@@ -39,67 +43,36 @@
 				.scene .mesh .surface {
 					transform-origin: 0% 0%;
 					position: absolute;
+					pointer-events: none;
+					touch-action: none;
+					image-rendering: pixelated;
+					user-select: none;
+					background-size: 100% 100%;
 				}
-
-					.scene .mesh .surface div {
-						position: absolute;
-						-webkit-backface-visibility: hidden;
-						backface-visibility: hidden;
-						-webkit-background-clip: content-box;
-						background-clip: content-box;
-						outline: 1px solid transparent;
-					}
 	</style>
 
 	<div class="scene" style="padding: 50px 30px 50px 30px;">
-		@{
-			string name = "no mesh";
-			GreedyMesh? mesh = null;
-			GroupedMesh? groupedMesh = null;
-			int width = 1;
-			int height = 1;
-			int depth = 1;
-
-			if (DemoModels.Models != null && Model < DemoModels.Models.Count)
-			{
-				var model = DemoModels.Models[Model];
-				if (model.Grouped.Surfaces != null)
-				{
-					name = model.Name;
-					mesh = model.Greedy;
-					groupedMesh = model.Grouped;
-					width = model.Model.Width;
-					height = model.Model.Height;
-					depth = model.Model.Depth;
-				}
-			}
-
+		@if (model != null)
+		{
 			if (UseDesiredWidth)
 			{
-				FaceSize = (int)DesiredWidth / width;
+				FaceSize = (int)DesiredWidth / model.Model.Width;
 			}
+			else
+			{
+				FaceSize = 1;
+			}
+			<PngLayerRenderer Model="model"
+							  FaceSize="FaceSize"
+							  Rotation="new Vector2(Direction, Pitch)"
+							  Scale="Scale" />
 		}
 
-		@if (mesh != null)
-		{
-			<div class="mesh" style="width: @(FaceSize * width)px; height: @(FaceSize * height)px; transform: rotateX(@(Pitch)deg) rotateY(@(Direction)deg)">
-				<div class="element" style="transform: scale3d(@Scale, -@Scale, @Scale) translate3d(0, @(FaceSize * height * -1.0f)px, @(FaceSize * depth * -0.5f)px)">
-					@foreach (var surfaceGroup in groupedMesh.Value.Surfaces.GroupBy(surf => new SurfaceDescription()
-					{
-						Normal = surf.Description.Normal,
-						Depth = surf.Description.Depth
-					}))
-					{
-						<img src="@RenderPNG(surfaceGroup, out int faceWidth, out int faceHeight)" width="@faceWidth" height="@faceHeight" class="surface" style="transform: @ToTransform(surfaceGroup.Key)" />
-					}
-				</div>
-			</div>
-
-			<p>@name</p>
-		}
 	</div>
 
 </div>
+
+<p>@(model?.Name ?? "no name")</p>
 
 <div class="input-group">
 	<div style="width: 96px; font-weight: bold;">Model</div>
@@ -122,7 +95,7 @@
 <div class="input-group">
 	<div style="width: 96px; font-weight: bold;">Scale</div>
 	<div style="width: 64px;">@Scale</div>
-	<input type="range" style="flex-grow: 1" min="0.01" max="1" step="0.01" @bind="@Scale" @bind:event="oninput" />
+	<input type="range" style="flex-grow: 1" min="0.01" max="50" step="0.01" @bind="@Scale" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
@@ -133,8 +106,8 @@
 </div>
 
 @code {
-	private int FaceSize = 50;
-	private float Scale = 1.0f;
+	private int FaceSize = 1;
+	private float Scale = 15.0f;
 
 	private int Model = 0;
 
@@ -151,74 +124,7 @@
 }
 
 @functions {
-	public string RenderPNG(IGrouping<SurfaceDescription, GroupedSurface> greedySurfaces, out int width, out int height)
-	{
-		sbyte maxX = 0;
-		sbyte maxY = 0;
 
-		foreach (var surface in greedySurfaces)
-		{
-			foreach (var face in surface.Faces)
-			{
-				maxX = Math.Max(maxX, face.TopRight.x);
-				maxY = Math.Max(maxY, face.TopRight.y);
-			}
-		}
-
-		width = maxX * FaceSize;
-		height = maxY * FaceSize;
-
-		// Creates a new image with empty pixel data.
-		using (var image = new Image<Rgba32>(maxX, maxY))
-		{
-			foreach (var surface in greedySurfaces)
-			{
-				foreach (var face in surface.Faces)
-				{
-					image[face.Position.x, face.Position.y] = new Rgba32(
-						surface.Description.Colour.r,
-						surface.Description.Colour.g,
-						surface.Description.Colour.b,
-						255
-					);
-				}
-			}
-
-			return image.ToBase64String(PngFormat.Instance);
-		}
-	}
-
-	public string ToTransform(SurfaceDescription surface)
-	{
-		var normal = surface.Normal;
-		int depth = surface.Depth;
-
-		if (normal == VoxelNormal.Up)
-		{
-			return $"rotateX(90deg) translate3d(0, 0, {depth * -FaceSize}px)";
-		}
-		else if (normal == VoxelNormal.Down)
-		{
-			return $"rotateX(90deg) translate3d(0, 0, {depth * FaceSize}px)";
-		}
-		else if (normal == VoxelNormal.Left)
-		{
-			return $"rotateY(-90deg) translate3d(0px, 0, {depth * FaceSize}px)";
-		}
-		else if (normal == VoxelNormal.Right)
-		{
-			return $"rotateY(-90deg) translate3d(0px, 0, {depth * -FaceSize}px)";
-		}
-		else if (normal == VoxelNormal.Back)
-		{
-			return $"translate3d(0, 0, {depth * -FaceSize}px)";
-		}
-		else if (normal == VoxelNormal.Forward)
-		{
-			return $"translate3d(0, 0, {depth * FaceSize}px)";
-		}
-		return "";
-	}
 
 	public string EncodeSvg(string svg)
 	{
