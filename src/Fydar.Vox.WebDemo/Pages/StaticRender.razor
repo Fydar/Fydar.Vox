@@ -36,10 +36,6 @@
 				transition: transform 0.6s;
 			}
 
-				.scene .mesh .element {
-					transform-style: preserve-3d;
-				}
-
 				.scene .mesh .surface {
 					transform-origin: 0% 0%;
 					position: absolute;
@@ -47,27 +43,17 @@
 					touch-action: none;
 					image-rendering: pixelated;
 					user-select: none;
-					background-size: 100% 100%;
 				}
 	</style>
 
-	<div class="scene" style="padding: 50px 30px 50px 30px;">
+	<div class="scene" style="padding: 250px 50px 50px 50px;">
 		@if (model != null)
 		{
-			if (UseDesiredWidth)
-			{
-				FaceSize = (int)DesiredWidth / model.Model.Width;
-			}
-			else
-			{
-				FaceSize = 1;
-			}
 			<PngLayerRenderer Model="model"
 							  FaceSize="FaceSize"
 							  Rotation="new Vector2(Direction, Pitch)"
 							  Scale="Scale" />
 		}
-
 	</div>
 
 </div>
@@ -99,23 +85,19 @@
 </div>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Width</div>
-	<input type="checkbox" style="width: 64px" @bind="@UseDesiredWidth" @bind:event="oninput" />
-	<div style="width: 64px;">@DesiredWidth</div>
-	<input type="range" style="flex-grow: 1" min="50" max="1000" step="10" @bind="@DesiredWidth" @bind:event="oninput" />
+	<div style="width: 96px; font-weight: bold;">Face Size</div>
+	<div style="width: 64px;">@FaceSize</div>
+	<input type="range" style="flex-grow: 1" min="1" max="128" step="1" @bind="@FaceSize" @bind:event="oninput" />
 </div>
 
 @code {
-	private int FaceSize = 1;
-	private float Scale = 15.0f;
-
 	private int Model = 0;
 
-	private float Pitch = -45.0f;
 	private float Direction = 30.0f;
+	private float Pitch = -45.0f;
 
-	private bool UseDesiredWidth = true;
-	private float DesiredWidth = 140;
+	private float Scale = 15.0f;
+	private int FaceSize = 1;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -124,8 +106,6 @@
 }
 
 @functions {
-
-
 	public string EncodeSvg(string svg)
 	{
 		var urlEncoded = UrlEncoder.Default.Encode(svg);

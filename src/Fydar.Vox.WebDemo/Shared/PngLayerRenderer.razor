@@ -2,23 +2,21 @@
 <style>
 	.surface {
 		background-image: url(@Model.ImageSource);
+		background-size: @(Model.OutputWidth * FaceSize)px @(Model.OutputHeight * FaceSize)px;
 	}
 </style>
 
 <div class="mesh" style="
-	width: @(FaceSize * Model.Model.Width)px;
-	height: @(FaceSize * Model.Model.Height)px;
-	transform: rotateX(@(Rotation.Y)deg) rotateY(@(Rotation.X)deg)">
+	width: @(Model.Model.Width * FaceSize)px;
+	height: @(Model.Model.Height * FaceSize)px;
+	transform: rotateX(@(Rotation.Y)deg) rotateY(@(Rotation.X)deg) scale3d(@Scale, @Scale, @Scale)">
 
-	<div class="element" style="transform: scale3d(@Scale, -@Scale, @Scale) translate3d(0, @(FaceSize * Model.Model.Height * -1.0f)px, @(FaceSize * Model.Model.Depth * -0.5f)px)">
-		@foreach (var sprite in Model.Sprites)
-		{
-			<div class="surface" style="
-				background-size: @(Model.OutputWidth)px @(Model.OutputHeight)px;
-				background-position: -@(sprite.UVPosition.X)px -@(sprite.UVPosition.Y)px;
-				width: @(sprite.RelativePosition.Width)px;
-				height: @(sprite.RelativePosition.Height)px;
-				transform: @ToTransform(sprite)" />
-		}
-	</div>
+	@foreach (var sprite in Model.Sprites)
+	{
+		<div class="surface" style="
+			background-position: -@(sprite.UVPosition.X * FaceSize)px -@(sprite.UVPosition.Y * FaceSize)px;
+			width: @(sprite.RelativePosition.Width * FaceSize)px;
+			height: @(sprite.RelativePosition.Height * FaceSize)px;
+			transform: @ToTransform(Model.Model, sprite)" />
+	}
 </div>
