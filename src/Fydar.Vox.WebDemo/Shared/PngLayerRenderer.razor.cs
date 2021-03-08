@@ -1,4 +1,5 @@
 ﻿using Fydar.Vox.Meshing;
+using Fydar.Vox.VoxFiles;
 using Fydar.Vox.WebDemo.Services.ImagePacker;
 using Microsoft.AspNetCore.Components;
 using SixLabors.ImageSharp;
@@ -27,6 +28,27 @@ namespace Fydar.Vox.WebDemo.Shared
 
 	public partial class PngLayerRenderer : ComponentBase
 	{
+		private class SpriteSizeSorting : IComparer<SurfaceSprite>
+		{
+			public static readonly SpriteSizeSorting Default = new();
+
+			public int Compare(SurfaceSprite left, SurfaceSprite right)
+			{
+				int delta = -left.RelativePosition.Width.CompareTo(right.RelativePosition.Width);
+				if (delta != 0)
+				{
+					return delta;
+				}
+
+				delta = -left.RelativePosition.Height.CompareTo(right.RelativePosition.Height);
+				if (delta != 0)
+				{
+					return delta;
+				}
+				return 0;
+			}
+		}
+
 		private DemoModel model;
 
 		[Parameter]
@@ -54,7 +76,6 @@ namespace Fydar.Vox.WebDemo.Shared
 
 		[Parameter]
 		public int FaceSize { get; set; }
-
 
 		protected override async Task OnInitializedAsync()
 		{
@@ -117,23 +138,7 @@ namespace Fydar.Vox.WebDemo.Shared
 				});
 			}
 
-			sprites.Sort(
-				(lhs, rhs) =>
-				{
-					int delta = -lhs.RelativePosition.Width.CompareTo(rhs.RelativePosition.Width);
-					if (delta != 0)
-					{
-						return delta;
-					}
-
-					delta = -lhs.RelativePosition.Height.CompareTo(rhs.RelativePosition.Height);
-					if (delta != 0)
-					{
-						return delta;
-					}
-					return 0;
-				});
-
+			sprites.Sort(SpriteSizeSorting.Default);
 
 			var packer = new MarchingAnchorRectanglePacker(512, 512);
 
@@ -159,13 +164,27 @@ namespace Fydar.Vox.WebDemo.Shared
 			{
 				foreach (var sprite in Model.Sprites)
 				{
-					foreach (var face in sprite.Faces)
+					if (sprite.Description.Normal == VoxelNormal.Up)
 					{
-						var position = new Point(
-							sprite.UVPosition.X + (face.Position.X - sprite.RelativePosition.Left),
-							sprite.UVPosition.Y + (face.Position.Y - sprite.RelativePosition.Top));
+						foreach (var face in sprite.Faces)
+						{
+							var position = new Point(
+								sprite.UVPosition.X + (face.Position.X - sprite.RelativePosition.Left),
+								sprite.UVPosition.Y + (face.Position.Y - sprite.RelativePosition.Top));
 
-						image[position.X, position.Y] = face.Color;
+							image[position.X, position.Y] = face.Color;
+						}
+					}
+					else
+					{
+						foreach (var face in sprite.Faces)
+						{
+							var position = new Point(
+								sprite.UVPosition.X + (face.Position.X - sprite.RelativePosition.Left),
+								sprite.UVPosition.Y + (sprite.RelativePosition.Height - (face.Position.Y - sprite.RelativePosition.Top) - 1));
+
+							image[position.X, position.Y] = face.Color;
+						}
 					}
 				}
 
@@ -173,7 +192,7 @@ namespace Fydar.Vox.WebDemo.Shared
 			}
 		}
 
-		public static int CeilPower2(int x)
+		private static int CeilPower2(int x)
 		{
 			if (x < 2)
 			{
@@ -182,34 +201,37 @@ namespace Fydar.Vox.WebDemo.Shared
 			return (int)Math.Pow(2, (int)Math.Log(x - 1, 2) + 1);
 		}
 
-		public string ToTransform(SurfaceSprite sprite)
+		private string ToTransform(VoxelModel model, SurfaceSprite sprite)
 		{
 			var normal = sprite.Description.Normal;
 			int depth = sprite.Description.Depth;
+			int depthOffset = depth * FaceSize;
+
+			float translationZ = model.Depth * 0.5f;
 
 			if (normal == VoxelNormal.Up)
 			{
-				return $"rotateX(90deg) translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top}px, {depth * -FaceSize}px)";
+				return $"rotateX(90deg) translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top - translationZ}px, {depthOffset - model.Height}px)";
 			}
 			else if (normal == VoxelNormal.Down)
 			{
-				return $"rotateX(90deg) translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top}px, {depth * FaceSize}px)";
+				return $"rotateX(-90deg) translate3d({sprite.RelativePosition.Left}px, {model.Depth - sprite.RelativePosition.Bottom - translationZ}px, {depthOffset + model.Height}px)";
 			}
 			else if (normal == VoxelNormal.Left)
 			{
-				return $"rotateY(-90deg) translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top}px, {depth * FaceSize}px)";
+				return $"rotateY(-90deg) translate3d({sprite.RelativePosition.Left - translationZ}px, {model.Height - sprite.RelativePosition.Bottom}px, {depthOffset * 1.0f}px)";
 			}
 			else if (normal == VoxelNormal.Right)
 			{
-				return $"rotateY(-90deg) translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top}px, {depth * -FaceSize}px)";
+				return $"rotateY(-90deg) translate3d({sprite.RelativePosition.Left - translationZ}px, {model.Height - sprite.RelativePosition.Bottom}px, {depthOffset * -1.0f}px)";
 			}
 			else if (normal == VoxelNormal.Back)
 			{
-				return $"translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top}px, {depth * -FaceSize}px)";
+				return $"translate3d({sprite.RelativePosition.Left}px, {model.Height - sprite.RelativePosition.Bottom}px, {(depthOffset * -1.0f) - translationZ}px)";
 			}
 			else if (normal == VoxelNormal.Forward)
 			{
-				return $"translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top}px, {depth * FaceSize}px)";
+				return $"translate3d({sprite.RelativePosition.Left}px, {model.Height - sprite.RelativePosition.Bottom}px, {(depthOffset * 1.0f) - translationZ}px)";
 			}
 			return "";
 		}
