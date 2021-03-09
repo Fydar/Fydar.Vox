@@ -164,13 +164,25 @@ namespace Fydar.Vox.WebDemo.Shared
 			{
 				foreach (var sprite in Model.Sprites)
 				{
-					if (sprite.Description.Normal == VoxelNormal.Up)
+					if (sprite.Description.Normal == VoxelNormal.Up
+						|| sprite.Description.Normal == VoxelNormal.Back)
 					{
 						foreach (var face in sprite.Faces)
 						{
 							var position = new Point(
 								sprite.UVPosition.X + (face.Position.X - sprite.RelativePosition.Left),
 								sprite.UVPosition.Y + (face.Position.Y - sprite.RelativePosition.Top));
+
+							image[position.X, position.Y] = face.Color;
+						}
+					}
+					else if (sprite.Description.Normal == VoxelNormal.Right)
+					{
+						foreach (var face in sprite.Faces)
+						{
+							var position = new Point(
+								sprite.UVPosition.X + (sprite.RelativePosition.Width - (face.Position.X - sprite.RelativePosition.Left) - 1),
+								sprite.UVPosition.Y + (sprite.RelativePosition.Height - (face.Position.Y - sprite.RelativePosition.Top) - 1));
 
 							image[position.X, position.Y] = face.Color;
 						}
@@ -223,11 +235,11 @@ namespace Fydar.Vox.WebDemo.Shared
 			}
 			else if (normal == VoxelNormal.Right)
 			{
-				return $"rotateY(-90deg) translate3d({sprite.RelativePosition.Left - translationZ}px, {model.Height - sprite.RelativePosition.Bottom}px, {depthOffset * -1.0f}px)";
+				return $"rotateY(90deg) translate3d({(model.Depth- sprite.RelativePosition.Right) - translationZ}px, {model.Height - sprite.RelativePosition.Bottom}px, {depthOffset * 1.0f}px)";
 			}
 			else if (normal == VoxelNormal.Back)
 			{
-				return $"translate3d({sprite.RelativePosition.Left}px, {model.Height - sprite.RelativePosition.Bottom}px, {(depthOffset * -1.0f) - translationZ}px)";
+				return $"rotateX(180deg) translate3d({sprite.RelativePosition.Left}px, {sprite.RelativePosition.Top - model.Height}px, {(depthOffset * 1.0f) + translationZ}px)";
 			}
 			else if (normal == VoxelNormal.Forward)
 			{
