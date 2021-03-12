@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fydar.Vox.Meshing\Fydar.Vox.Meshing.csproj" />
+    <ProjectReference Include="..\Fydar.Vox.Models\Fydar.Vox.Models.csproj" />
+  </ItemGroup>
+
+</Project>
