@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Fydar.Vox.WebDemo.Services.ImagePacker
+namespace Fydar.Vox.Export.ToHtml.Internal.ImagePacker
 {
 	public class MarchingAnchorRectanglePacker : IRectanglePacker
 	{

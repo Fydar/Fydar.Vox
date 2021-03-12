@@ -1,8 +1,8 @@
 ﻿
 <style>
 	.surface {
-		background-image: url(@Model.ImageSource);
-		background-size: @(Model.OutputWidth * FaceSize)px @(Model.OutputHeight * FaceSize)px;
+		background-image: url(@Model.SpriteAtlasImage);
+		background-size: @(Model.LayeredModel.SpriteAtlasResolution.Width * FaceSize)px @(Model.LayeredModel.SpriteAtlasResolution.Height * FaceSize)px;
 	}
 </style>
 
@@ -11,12 +11,12 @@
 	height: @(Model.Model.Height * FaceSize)px;
 	transform: rotateX(@(Rotation.Y)deg) rotateY(@(Rotation.X)deg) scale3d(@Scale, @Scale, @Scale)">
 
-	@foreach (var sprite in Model.Sprites)
+	@foreach (var sprite in Model.LayeredModel.Sprites)
 	{
 		<div class="surface" style="
-			background-position: -@(sprite.UVPosition.X * FaceSize)px -@(sprite.UVPosition.Y * FaceSize)px;
-			width: @(sprite.RelativePosition.Width * FaceSize)px;
-			height: @(sprite.RelativePosition.Height * FaceSize)px;
-			transform: @ToTransform(Model.Model, sprite)" />
+			background-position: -@(sprite.UV.X * FaceSize)px -@(sprite.UV.Y * FaceSize)px;
+			width: @(sprite.Position.Width * FaceSize)px;
+			height: @(sprite.Position.Height * FaceSize)px;
+			transform: @sprite.ToTransform()" />
 	}
 </div>

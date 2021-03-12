@@ -22,6 +22,7 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Fydar.Vox.Export.ToHtml\Fydar.Vox.Export.ToHtml.csproj" />
 		<ProjectReference Include="..\Fydar.Vox.Meshing\Fydar.Vox.Meshing.csproj" />
 		<ProjectReference Include="..\Fydar.Vox.VoxFiles\Fydar.Vox.VoxFiles.csproj" />
 		<ProjectReference Include="..\Fydar.Vox.Models\Fydar.Vox.Models.csproj" />

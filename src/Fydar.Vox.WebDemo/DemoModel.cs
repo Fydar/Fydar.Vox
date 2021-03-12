@@ -1,8 +1,7 @@
-﻿using Fydar.Vox.Meshing;
+﻿using Fydar.Vox.Export.ToHtml;
+using Fydar.Vox.Meshing;
 using Fydar.Vox.Meshing.Greedy;
 using Fydar.Vox.VoxFiles;
-using Fydar.Vox.WebDemo.Shared;
-using System.Collections.Generic;
 
 namespace Fydar.Vox.WebDemo
 {
@@ -13,10 +12,8 @@ namespace Fydar.Vox.WebDemo
 		public GroupedMesh Grouped;
 		public GreedyMesh Greedy;
 
-		public int OutputWidth { get; set; }
-		public int OutputHeight { get; set; }
-		public string ImageSource { get; set; }
-		public List<SurfaceSprite> Sprites { get; set; }
+		public LayeredModel LayeredModel;
+		public string SpriteAtlasImage;
 
 		public DemoModel(string name, DataVoxelizerDriver voxelDriver, VoxelModel model = null)
 		{
@@ -26,6 +23,9 @@ namespace Fydar.Vox.WebDemo
 			Greedy = new GreedyMesher().Optimize(Grouped);
 
 			Model = model;
+
+			LayeredModel = LayeredModel.Create(model);
+			SpriteAtlasImage = LayeredModel.RenderImageString();
 		}
 	}
 }

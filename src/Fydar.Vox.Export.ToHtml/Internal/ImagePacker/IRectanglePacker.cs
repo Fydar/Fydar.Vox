@@ -1,6 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 
-namespace Fydar.Vox.WebDemo.Services.ImagePacker
+namespace Fydar.Vox.Export.ToHtml.Internal.ImagePacker
 {
 	public interface IRectanglePacker
 	{
