@@ -1,0 +1,451 @@
+<style>
+		.scene {
+			display: inline-block;
+			overflow: hidden;
+			box-sizing: border-box;
+			perspective: 2048px;
+			width: 100%;
+			height: 650px;
+		}
+
+		.scene .mesh {
+			position: relative;
+			margin: auto;
+			transform-style: preserve-3d;
+			transition: transform 0.6s;
+		}
+
+			.scene .mesh .surface {
+				transform-origin: 0% 0%;
+				position: absolute;
+				pointer-events: none;
+				touch-action: none;
+				image-rendering: pixelated;
+				user-select: none;
+				backface-visibility: hidden;
+			}
+.anim-rotate-left {
+	animation: anim-rotate-left 1s linear normal;
+	animation-play-state: paused;
+	animation-delay: calc(var(--scroll) * -1s);
+}
+
+@keyframes anim-rotate-left {
+	from {
+		transform: rotateX(20deg) rotateY(50deg) scale3d(22.5, 22.5, 22.5);
+	}
+
+	to {
+		transform: rotateX(-45deg) rotateY(10deg) scale3d(22.5, 22.5, 22.5);
+	}
+}
+
+.anim-rotate-vertical {
+	animation: anim-rotate-vertical 1s linear normal;
+	animation-play-state: paused;
+	animation-delay: calc(var(--scroll) * -1s);
+}
+
+@keyframes anim-rotate-vertical {
+	from {
+		transform: rotateX(20deg) rotateY(45deg) scale3d(22.5, 22.5, 22.5);
+	}
+
+	to {
+		transform: rotateX(-45deg) rotateY(45deg) scale3d(22.5, 22.5, 22.5);
+	}
+}
+</style>
+<div style="height: 100vh"></div>
+<div class="scene" style = "padding: 320px 50px 50px 50px;">
+<style>
+	.surface {
+		background-image: url(data:image/png;base64,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);
+		background-size: 128px 64px;
+	}
+</style>
+
+<div class="mesh anim-rotate-left fsa-relative" style="
+	width: 11px;
+	height: 24px;
+	transform: rotateX(-30deg) rotateY(55deg) scale3d(22.5, 22.5, 22.5)">
+
+		<div class="surface" style="
+			background-position: -0px -0px;
+			width: 20px;		
+			height: 13px;	
+			transform: rotateY(-90deg) translate3d(-9.5px, 4px, -4.01px)"></div>
+		<div class="surface" style="
+			background-position: -0px -14px;
+			width: 20px;		
+			height: 13px;	
+			transform: rotateY(90deg) translate3d(-10.5px, 4px, 6.99px)"></div>
+		<div class="surface" style="
+			background-position: -21px -0px;
+			width: 17px;		
+			height: 23px;	
+			transform: rotateY(90deg) translate3d(-6.5px, 1px, 3.99px)"></div>
+		<div class="surface" style="
+			background-position: -39px -0px;
+			width: 17px;		
+			height: 23px;	
+			transform: rotateY(90deg) translate3d(-6.5px, 1px, 7.99px)"></div>
+		<div class="surface" style="
+			background-position: -0px -28px;
+			width: 17px;		
+			height: 23px;	
+			transform: rotateY(-90deg) translate3d(-10.5px, 1px, -7.01px)"></div>
+		<div class="surface" style="
+			background-position: -21px -24px;
+			width: 17px;		
+			height: 23px;	
+			transform: rotateY(-90deg) translate3d(-10.5px, 1px, -3.01px)"></div>
+		<div class="surface" style="
+			background-position: -39px -24px;
+			width: 11px;		
+			height: 15px;	
+			transform: translate3d(0px, 0px, 4.49px)"></div>
+		<div class="surface" style="
+			background-position: -0px -52px;
+			width: 11px;		
+			height: 9px;	
+			transform: rotateX(180deg) translate3d(0px, -9px, -3.51px)"></div>
+		<div class="surface" style="
+			background-position: -0px -62px;
+			width: 11px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(0px, -4.5px, 0.99px)"></div>
+		<div class="surface" style="
+			background-position: -12px -52px;
+			width: 11px;		
+			height: 1px;	
+			transform: rotateX(90deg) translate3d(0px, 3.5px, -0.01px)"></div>
+		<div class="surface" style="
+			background-position: -51px -24px;
+			width: 9px;		
+			height: 13px;	
+			transform: translate3d(1px, 1px, 5.49px)"></div>
+		<div class="surface" style="
+			background-position: -12px -54px;
+			width: 9px;		
+			height: 5px;	
+			transform: rotateX(180deg) translate3d(1px, -6px, -4.51px)"></div>
+		<div class="surface" style="
+			background-position: -18px -48px;
+			width: 9px;		
+			height: 2px;	
+			transform: rotateX(90deg) translate3d(1px, 4.5px, -2.01px)"></div>
+		<div class="surface" style="
+			background-position: -12px -60px;
+			width: 9px;		
+			height: 2px;	
+			transform: rotateX(-90deg) translate3d(1px, -6.5px, 2.99px)"></div>
+		<div class="surface" style="
+			background-position: -22px -54px;
+			width: 9px;		
+			height: 2px;	
+			transform: rotateX(90deg) translate3d(1px, 3.5px, -1.01px)"></div>
+		<div class="surface" style="
+			background-position: -28px -48px;
+			width: 9px;		
+			height: 2px;	
+			transform: rotateX(-90deg) translate3d(1px, -5.5px, 1.99px)"></div>
+		<div class="surface" style="
+			background-position: -39px -40px;
+			width: 7px;		
+			height: 11px;	
+			transform: translate3d(2px, 2px, 6.49px)"></div>
+		<div class="surface" style="
+			background-position: -57px -0px;
+			width: 5px;		
+			height: 15px;	
+			transform: rotateX(180deg) translate3d(3px, -24px, -2.51px)"></div>
+		<div class="surface" style="
+			background-position: -47px -40px;
+			width: 5px;		
+			height: 14px;	
+			transform: rotateX(90deg) translate3d(3px, -10.5px, -19.01px)"></div>
+		<div class="surface" style="
+			background-position: -53px -38px;
+			width: 5px;		
+			height: 14px;	
+			transform: rotateX(-90deg) translate3d(3px, -3.5px, 23.99px)"></div>
+		<div class="surface" style="
+			background-position: -63px -0px;
+			width: 5px;		
+			height: 13px;	
+			transform: rotateX(90deg) translate3d(3px, -10.5px, -13.01px)"></div>
+		<div class="surface" style="
+			background-position: -69px -0px;
+			width: 5px;		
+			height: 12px;	
+			transform: rotateX(-90deg) translate3d(3px, -2.5px, 19.99px)"></div>
+		<div class="surface" style="
+			background-position: -75px -0px;
+			width: 5px;		
+			height: 11px;	
+			transform: rotateX(180deg) translate3d(3px, -24px, 10.49px)"></div>
+		<div class="surface" style="
+			background-position: -63px -14px;
+			width: 5px;		
+			height: 10px;	
+			transform: rotateX(180deg) translate3d(3px, -20px, -1.51px)"></div>
+		<div class="surface" style="
+			background-position: -81px -0px;
+			width: 5px;		
+			height: 9px;	
+			transform: rotateX(-90deg) translate3d(3px, -1.5px, 18.99px)"></div>
+		<div class="surface" style="
+			background-position: -69px -13px;
+			width: 5px;		
+			height: 9px;	
+			transform: translate3d(3px, 15px, 3.49px)"></div>
+		<div class="surface" style="
+			background-position: -57px -16px;
+			width: 5px;		
+			height: 7px;	
+			transform: rotateX(180deg) translate3d(3px, -18px, 0.49px)"></div>
+		<div class="surface" style="
+			background-position: -32px -51px;
+			width: 5px;		
+			height: 7px;	
+			transform: rotateX(180deg) translate3d(3px, -19px, 9.49px)"></div>
+		<div class="surface" style="
+			background-position: -22px -57px;
+			width: 5px;		
+			height: 6px;	
+			transform: translate3d(3px, 13px, -6.51px)"></div>
+		<div class="surface" style="
+			background-position: -87px -0px;
+			width: 5px;		
+			height: 6px;	
+			transform: translate3d(3px, 13px, 2.49px)"></div>
+		<div class="surface" style="
+			background-position: -75px -12px;
+			width: 5px;		
+			height: 4px;	
+			transform: translate3d(3px, 20px, -9.51px)"></div>
+		<div class="surface" style="
+			background-position: -61px -25px;
+			width: 5px;		
+			height: 3px;	
+			transform: rotateX(180deg) translate3d(3px, -5px, -5.51px)"></div>
+		<div class="surface" style="
+			background-position: -24px -51px;
+			width: 5px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(3px, -6.5px, 3.99px)"></div>
+		<div class="surface" style="
+			background-position: -61px -29px;
+			width: 5px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(3px, -0.5px, 17.99px)"></div>
+		<div class="surface" style="
+			background-position: -28px -59px;
+			width: 5px;		
+			height: 1px;	
+			transform: translate3d(3px, 19px, -7.51px)"></div>
+		<div class="surface" style="
+			background-position: -28px -61px;
+			width: 5px;		
+			height: 1px;	
+			transform: rotateX(180deg) translate3d(3px, -19px, -0.51px)"></div>
+		<div class="surface" style="
+			background-position: -81px -10px;
+			width: 3px;		
+			height: 14px;	
+			transform: rotateX(-90deg) translate3d(4px, -3.5px, 15.99px)"></div>
+		<div class="surface" style="
+			background-position: -38px -52px;
+			width: 3px;		
+			height: 11px;	
+			transform: rotateX(-90deg) translate3d(4px, -2.5px, 16.99px)"></div>
+		<div class="surface" style="
+			background-position: -67px -25px;
+			width: 3px;		
+			height: 9px;	
+			transform: rotateX(90deg) translate3d(4px, -9.5px, -12.01px)"></div>
+		<div class="surface" style="
+			background-position: -61px -31px;
+			width: 3px;		
+			height: 7px;	
+			transform: rotateX(90deg) translate3d(4px, 3.5px, -6.01px)"></div>
+		<div class="surface" style="
+			background-position: -75px -17px;
+			width: 3px;		
+			height: 4px;	
+			transform: rotateX(90deg) translate3d(4px, 4.5px, -5.01px)"></div>
+		<div class="surface" style="
+			background-position: -34px -59px;
+			width: 3px;		
+			height: 3px;	
+			transform: rotateX(-90deg) translate3d(4px, -9.5px, 8.99px)"></div>
+		<div class="surface" style="
+			background-position: -93px -0px;
+			width: 3px;		
+			height: 2px;	
+			transform: translate3d(4px, 6px, 10.49px)"></div>
+		<div class="surface" style="
+			background-position: -42px -52px;
+			width: 3px;		
+			height: 2px;	
+			transform: rotateX(90deg) translate3d(4px, -0.5px, -11.01px)"></div>
+		<div class="surface" style="
+			background-position: -28px -57px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(90deg) translate3d(4px, 5.5px, -3.01px)"></div>
+		<div class="surface" style="
+			background-position: -69px -23px;
+			width: 3px;		
+			height: 1px;	
+			transform: translate3d(4px, 5px, 8.49px)"></div>
+		<div class="surface" style="
+			background-position: -87px -7px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(4px, -10.5px, 7.99px)"></div>
+		<div class="surface" style="
+			background-position: -85px -10px;
+			width: 3px;		
+			height: 1px;	
+			transform: translate3d(4px, 8px, 9.49px)"></div>
+		<div class="surface" style="
+			background-position: -73px -23px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(90deg) translate3d(4px, 2.5px, -9.01px)"></div>
+		<div class="surface" style="
+			background-position: -93px -3px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(90deg) translate3d(4px, 1.5px, -10.01px)"></div>
+		<div class="surface" style="
+			background-position: -71px -25px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(4px, -6.5px, 12.99px)"></div>
+		<div class="surface" style="
+			background-position: -42px -55px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(4px, -5.5px, 13.99px)"></div>
+		<div class="surface" style="
+			background-position: -85px -12px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(-90deg) translate3d(4px, -4.5px, 14.99px)"></div>
+		<div class="surface" style="
+			background-position: -97px -0px;
+			width: 3px;		
+			height: 1px;	
+			transform: rotateX(180deg) translate3d(4px, -17px, 8.49px)"></div>
+		<div class="surface" style="
+			background-position: -18px -28px;
+			width: 2px;		
+			height: 2px;	
+			transform: rotateY(90deg) translate3d(-5.5px, 1px, 9.99px)"></div>
+		<div class="surface" style="
+			background-position: -18px -31px;
+			width: 2px;		
+			height: 2px;	
+			transform: rotateY(-90deg) translate3d(3.5px, 1px, -1.01px)"></div>
+		<div class="surface" style="
+			background-position: -18px -34px;
+			width: 1px;		
+			height: 3px;	
+			transform: rotateY(-90deg) translate3d(-10.5px, 13px, -5.01px)"></div>
+		<div class="surface" style="
+			background-position: -18px -38px;
+			width: 1px;		
+			height: 3px;	
+			transform: rotateY(90deg) translate3d(9.5px, 13px, 5.99px)"></div>
+		<div class="surface" style="
+			background-position: -18px -42px;
+			width: 1px;		
+			height: 2px;	
+			transform: rotateY(90deg) translate3d(-6.5px, 3px, 4.99px)"></div>
+		<div class="surface" style="
+			background-position: -18px -45px;
+			width: 1px;		
+			height: 2px;	
+			transform: rotateY(-90deg) translate3d(5.5px, 3px, -6.01px)"></div>
+		<div class="surface" style="
+			background-position: -30px -51px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(90deg) translate3d(-6.5px, 2px, 8.99px)"></div>
+		<div class="surface" style="
+			background-position: -51px -38px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(-90deg) translate3d(3.5px, 1px, -9.01px)"></div>
+		<div class="surface" style="
+			background-position: -65px -31px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(-90deg) translate3d(4.5px, 2px, -8.01px)"></div>
+		<div class="surface" style="
+			background-position: -79px -17px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(-90deg) translate3d(3.5px, 0px, -10.01px)"></div>
+		<div class="surface" style="
+			background-position: -59px -38px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(90deg) translate3d(-4.5px, 0px, 0.99px)"></div>
+		<div class="surface" style="
+			background-position: -65px -33px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(90deg) translate3d(-4.5px, 1px, 1.99px)"></div>
+		<div class="surface" style="
+			background-position: -71px -27px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(90deg) translate3d(-5.5px, 2px, 2.99px)"></div>
+		<div class="surface" style="
+			background-position: -91px -7px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(-90deg) translate3d(5.5px, 2px, -2.01px)"></div>
+		<div class="surface" style="
+			background-position: -93px -5px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(-90deg) translate3d(3.5px, 0px, -0.01px)"></div>
+		<div class="surface" style="
+			background-position: -79px -19px;
+			width: 1px;		
+			height: 1px;	
+			transform: rotateY(90deg) translate3d(-4.5px, 0px, 10.99px)"></div>
+</div>
+</div>
+</div>
+<div style="height: 100vh"></div>
+<script>
+	const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
+	const invlerp = (x, y, a) => clamp((a - x) / (y - x));
+	
+	function UpdateRelativeElements() {
+		var fsaRelativeObjects = document.getElementsByClassName("fsa-relative");
+	
+		for (let p = 0; p < fsaRelativeObjects.length; p++) {
+			var fsaRelative = fsaRelativeObjects[p];
+	
+			var bounds = fsaRelative.getBoundingClientRect();
+			var scroll = invlerp(-bounds.height, screen.height, bounds.top);
+	
+			fsaRelative.style.setProperty("--scroll", scroll);
+		}
+	}
+	
+	window.addEventListener("scroll",
+		() => { UpdateRelativeElements(); }, false
+	);
+	window.addEventListener("resize",
+		() => { UpdateRelativeElements(); }, false
+	);
+	UpdateRelativeElements();
+</script>

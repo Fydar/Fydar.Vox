@@ -1,4 +1,5 @@
-﻿using Fydar.Vox.VoxFiles;
+﻿using Fydar.Vox.Export.ToHtml;
+using Fydar.Vox.VoxFiles;
 using Fydar.Vox.VoxFiles.Hierarchy;
 using Fydar.Voxelizer.Demo;
 using System;
@@ -10,6 +11,9 @@ namespace Fydar.Vox.ConsoleDemo
 	{
 		private static void Main(string[] args)
 		{
+			ExportFile("deer.vox", "deer.html");
+			ExportFile("sniper.vox", "sniper.html");
+
 			FirstDemo.Run();
 
 			var fileInfo = new FileInfo("demo-scene.vox");
@@ -40,6 +44,17 @@ namespace Fydar.Vox.ConsoleDemo
 			{
 				Console.WriteLine(model.Parents[0].Name);
 			}
+		}
+
+		private static void ExportFile(string source, string destination)
+		{
+			var oFileInfo = new FileInfo(source);
+
+			var oDocument = new VoxDocument(File.ReadAllBytes(oFileInfo.FullName));
+			var oVoxelScene = new VoxelScene(oDocument);
+			var oModel = oVoxelScene.Models[0];
+
+			ToHtmlExporter.WriteToFile(oModel, destination);
 		}
 
 		private static void PrintLayers(VoxelScene voxelScene)
