@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Fydar.Vox.Export.ToHtml\Fydar.Vox.Export.ToHtml.csproj" />
     <ProjectReference Include="..\Fydar.Vox.Meshing\Fydar.Vox.Meshing.csproj" />
     <ProjectReference Include="..\Fydar.Vox.Models\Fydar.Vox.Models.csproj" />
     <ProjectReference Include="..\Fydar.Vox.VoxFiles\Fydar.Vox.VoxFiles.csproj" />
@@ -17,6 +18,12 @@
 
   <ItemGroup>
     <None Update="demo-scene.vox">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="deer.vox">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="sniper.vox">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
