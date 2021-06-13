@@ -6,8 +6,8 @@ namespace Fydar.Vox.VoxFiles.Hierarchy
 	{
 		internal int childNodeId;
 
-		public VoxelNode ChildNode { get; set; }
-		public VoxelLayer Layer { get; set; }
+		public VoxelNode? ChildNode { get; set; }
+		public VoxelLayer? Layer { get; set; }
 
 		public int ReservedId { get; set; }
 

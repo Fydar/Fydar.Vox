@@ -1,8 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
+
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>portable</DebugType>
@@ -11,12 +15,15 @@
     <Optimize>true</Optimize>
     <Configuration>Release</Configuration>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.12.1" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Fydar.Vox.Meshing\Fydar.Vox.Meshing.csproj" />
     <ProjectReference Include="..\Fydar.Vox.Models\Fydar.Vox.Models.csproj" />
   </ItemGroup>
+
 </Project>

@@ -8,14 +8,14 @@ namespace Fydar.Vox.WebDemo
 	public class DemoModel
 	{
 		public string Name;
-		public VoxelModel Model;
 		public GroupedMesh Grouped;
 		public GreedyMesh Greedy;
 
+		public VoxelModel Model;
 		public LayeredModel LayeredModel;
 		public string SpriteAtlasImage;
 
-		public DemoModel(string name, DataVoxelizerDriver voxelDriver, VoxelModel model = null)
+		public DemoModel(string name, DataVoxelizerDriver voxelDriver, VoxelModel model)
 		{
 			Name = name;
 			var voxelizer = new GroupedMesher(voxelDriver);

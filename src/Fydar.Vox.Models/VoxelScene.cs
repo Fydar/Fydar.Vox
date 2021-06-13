@@ -18,6 +18,9 @@ namespace Fydar.Vox.VoxFiles
 			{
 				new VoxelLayer(0)
 			};
+			Pallette = VoxelColourPallette.GenerateDefault();
+			Models = Array.Empty<VoxelModel>();
+			Root = new VoxelTransform(1);
 		}
 
 		public VoxelScene(VoxDocument document)
@@ -30,7 +33,7 @@ namespace Fydar.Vox.VoxFiles
 
 		private static VoxelNode LoadHierarchy(VoxelScene scene, VoxDocument document, VoxelLayer[] layers)
 		{
-			VoxelTransform root = null;
+			VoxelTransform? root = null;
 			var nodes = new Dictionary<int, VoxelNode>();
 
 			foreach (var chunk in document.Main.Children)
@@ -63,11 +66,12 @@ namespace Fydar.Vox.VoxFiles
 
 					var shapeNode = new VoxelShape(chunknSHP.NodeId)
 					{
-						NodeAttributes = chunknSHP.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-						Models = chunknSHP.Models.Elements
-						.Select(model => scene.Models[model.ModelId])
-						.ToList()
+						NodeAttributes = chunknSHP.NodeAttributes.KeyValuePairs.ToDictionary(kvp => kvp.Key, kvp => kvp.Value)
 					};
+					shapeNode.Models.AddRange(chunknSHP.Models.Elements
+						.Select(model => scene.Models[model.ModelId])
+						.ToList());
+
 					foreach (var model in shapeNode.Models)
 					{
 						model.Parents.Add(shapeNode);
@@ -106,6 +110,11 @@ namespace Fydar.Vox.VoxFiles
 					transformNode.ChildNode = transformedChild;
 					transformedChild.Parent = transformNode;
 				}
+			}
+
+			if (root == null)
+			{
+				throw new InvalidOperationException("Unable to determine scene root");
 			}
 
 			scene.Root = root;

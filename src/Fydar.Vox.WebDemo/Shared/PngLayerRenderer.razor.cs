@@ -7,7 +7,7 @@ namespace Fydar.Vox.WebDemo.Shared
 	public partial class PngLayerRenderer : ComponentBase
 	{
 		[Parameter]
-		public DemoModel Model { get; set; }
+		public DemoModel? Model { get; set; }
 
 		[Parameter]
 		public Vector3 Position { get; set; }

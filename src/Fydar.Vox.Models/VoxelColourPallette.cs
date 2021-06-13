@@ -1,4 +1,6 @@
-﻿namespace Fydar.Vox.VoxFiles
+﻿using System;
+
+namespace Fydar.Vox.VoxFiles
 {
 	public class VoxelColourPallette
 	{
@@ -39,7 +41,7 @@
 			};
 		}
 
-		public VoxDocumentColour[] Colours { get; set; }
+		public VoxDocumentColour[] Colours { get; set; } = Array.Empty<VoxDocumentColour>();
 
 		public VoxelColourPallette()
 		{

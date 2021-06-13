@@ -25,11 +25,7 @@ namespace Fydar.Vox.Export.ToHtml
 				}
 
 				delta = -left.Position.Height.CompareTo(right.Position.Height);
-				if (delta != 0)
-				{
-					return delta;
-				}
-				return 0;
+				return delta != 0 ? delta : 0;
 			}
 		}
 

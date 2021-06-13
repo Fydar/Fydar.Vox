@@ -1,12 +1,16 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Fydar.Vox.Meshing.Greedy;
 using Fydar.Vox.VoxFiles;
+using System;
 using System.Collections.Generic;
 
 namespace Fydar.Vox.Meshing.Benchmarks
 {
 	public class MeshingBenchmarks
 	{
+		[ParamsSource(nameof(TestCases))]
+		public MeshingTestCase TestCase { get; set; }
+
 		public List<MeshingTestCase> TestCases { get; }
 
 		public MeshingBenchmarks()
@@ -40,14 +44,16 @@ namespace Fydar.Vox.Meshing.Benchmarks
 			scene.Models = testModels.ToArray();
 
 			TestCases = new List<MeshingTestCase>();
+			MeshingTestCase? defaultTestCase = null;
 			foreach (var model in scene.Models)
 			{
-				TestCases.Add(new MeshingTestCase($"Cube {model.Width}x{model.Height}x{model.Depth}", model));
+				var newTestCase = new MeshingTestCase($"Cube {model.Width}x{model.Height}x{model.Depth}", model);
+				defaultTestCase = newTestCase;
+				TestCases.Add(newTestCase);
 			}
-		}
 
-		[ParamsSource(nameof(TestCases))]
-		public MeshingTestCase TestCase { get; set; }
+			TestCase = defaultTestCase ?? throw new InvalidOperationException("Unable to locate any test cases");
+		}
 
 		[Benchmark]
 		public void GroupedMeshing()

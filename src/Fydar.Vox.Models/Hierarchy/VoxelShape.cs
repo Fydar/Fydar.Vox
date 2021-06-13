@@ -4,7 +4,7 @@ namespace Fydar.Vox.VoxFiles.Hierarchy
 {
 	public class VoxelShape : VoxelNode
 	{
-		public List<VoxelModel> Models { get; set; }
+		public List<VoxelModel> Models { get; }
 
 		public override string Name
 		{
@@ -28,6 +28,8 @@ namespace Fydar.Vox.VoxFiles.Hierarchy
 
 		public VoxelShape(VoxDocument document, int startIndex)
 		{
+			Models = new List<VoxelModel>();
+
 			int offset = startIndex;
 			NodeId = document.ReadInt32(ref offset);
 			var voxDictionary = document.ReadStructure<VoxStructureDictionary>(ref offset);
