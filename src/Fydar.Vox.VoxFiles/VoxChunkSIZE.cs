@@ -1,5 +1,8 @@
 ﻿namespace Fydar.Vox.VoxFiles
 {
+	/// <summary>
+	/// Represents chunks of data for .vox file model size.
+	/// </summary>
 	public struct VoxChunkSIZE : IVoxChunk
 	{
 		public int X;

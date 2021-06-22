@@ -4,13 +4,13 @@ namespace Fydar.Vox.Meshing
 {
 	public struct Colour24 : IEquatable<Colour24>
 	{
-		public static Colour24 White => new Colour24(255, 255, 255);
-		public static Colour24 Black => new Colour24(0, 0, 0);
+		public static Colour24 White => new(255, 255, 255);
+		public static Colour24 Black => new(0, 0, 0);
 
-		public static Colour24 Red => new Colour24(255, 0, 0);
-		public static Colour24 Green => new Colour24(0, 255, 0);
-		public static Colour24 Orange => new Colour24(255, 128, 0);
-		public static Colour24 Blue => new Colour24(0, 0, 255);
+		public static Colour24 Red => new(255, 0, 0);
+		public static Colour24 Green => new(0, 255, 0);
+		public static Colour24 Orange => new(255, 128, 0);
+		public static Colour24 Blue => new(0, 0, 255);
 
 		public byte r;
 		public byte g;

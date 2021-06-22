@@ -1,5 +1,9 @@
 ﻿namespace Fydar.Vox.VoxFiles
 {
+	/// <summary>
+	/// A mechanism for loading chunks.
+	/// </summary>
+	/// <typeparam name="TChunk">A structure representing the chunk contents.</typeparam>
 	public struct VoxChunkLoader<TChunk>
 		where TChunk : struct, IVoxChunk
 	{

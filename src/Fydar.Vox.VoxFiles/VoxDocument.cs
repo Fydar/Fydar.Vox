@@ -4,8 +4,11 @@ using System.Text;
 namespace Fydar.Vox.VoxFiles
 {
 	/// <summary>
-	/// https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
+	/// Represents a .vox file.
 	/// </summary>
+	/// <remarks>
+	/// https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
+	/// </remarks>
 	public class VoxDocument
 	{
 		public byte[] Content { get; }

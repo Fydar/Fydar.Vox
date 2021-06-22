@@ -38,10 +38,10 @@ namespace Fydar.Vox.VoxFiles
 
 			foreach (var chunk in document.Main.Children)
 			{
-				if (VoxChunks.nTRN.CanImport(chunk.NameToString()))
+				if (VoxChunks.NTRN.CanImport(chunk.NameToString()))
 				{
 					int offset = chunk.ContentStartIndex;
-					var chunknTRN = VoxChunks.nTRN.Read(document, ref offset);
+					var chunknTRN = VoxChunks.NTRN.Read(document, ref offset);
 
 					var transformNode = new VoxelTransform(chunknTRN.NodeId)
 					{
@@ -59,10 +59,10 @@ namespace Fydar.Vox.VoxFiles
 			}
 			foreach (var chunk in document.Main.Children)
 			{
-				if (VoxChunks.nSHP.CanImport(chunk.NameToString()))
+				if (VoxChunks.NSHP.CanImport(chunk.NameToString()))
 				{
 					int offset = chunk.ContentStartIndex;
-					var chunknSHP = VoxChunks.nSHP.Read(document, ref offset);
+					var chunknSHP = VoxChunks.NSHP.Read(document, ref offset);
 
 					var shapeNode = new VoxelShape(chunknSHP.NodeId)
 					{
@@ -81,10 +81,10 @@ namespace Fydar.Vox.VoxFiles
 			}
 			foreach (var chunk in document.Main.Children)
 			{
-				if (VoxChunks.nGRP.CanImport(chunk.NameToString()))
+				if (VoxChunks.NGRP.CanImport(chunk.NameToString()))
 				{
 					int offset = chunk.ContentStartIndex;
-					var chunknGRP = VoxChunks.nGRP.Read(document, ref offset);
+					var chunknGRP = VoxChunks.NGRP.Read(document, ref offset);
 
 					var groupNode = new VoxelGrouping(chunknGRP.NodeId)
 					{

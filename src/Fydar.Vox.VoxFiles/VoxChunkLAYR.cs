@@ -1,5 +1,8 @@
 ﻿namespace Fydar.Vox.VoxFiles
 {
+	/// <summary>
+	/// Represents chunks of data for .vox file layer configuration.
+	/// </summary>
 	public struct VoxChunkLAYR : IVoxChunk
 	{
 		public int LayerId;

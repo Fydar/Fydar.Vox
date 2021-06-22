@@ -1,5 +1,8 @@
 ﻿namespace Fydar.Vox.VoxFiles
 {
+	/// <summary>
+	/// Represents chunks of data for .vox file group nodes.
+	/// </summary>
 	public struct VoxChunknGRP : IVoxChunk
 	{
 		public int NodeId { get; set; }
