@@ -1,5 +1,8 @@
 ﻿namespace Fydar.Vox.VoxFiles
 {
+	/// <summary>
+	/// Represents chunks of data for .vox file voxel data.
+	/// </summary>
 	public struct VoxChunkXYZI : IVoxChunk
 	{
 		public VoxStructureVoxelArray Voxels;

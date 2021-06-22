@@ -4,13 +4,13 @@ namespace Fydar.Vox.Meshing
 {
 	public struct Vector2SByte : IEquatable<Vector2SByte>
 	{
-		public static Vector2SByte Zero => new Vector2SByte(0, 0);
-		public static Vector2SByte One => new Vector2SByte(1, 1);
+		public static Vector2SByte Zero => new(0, 0);
+		public static Vector2SByte One => new(1, 1);
 
-		public static Vector2SByte Left => new Vector2SByte(-1, 0);
-		public static Vector2SByte Right => new Vector2SByte(1, 0);
-		public static Vector2SByte Up => new Vector2SByte(0, 1);
-		public static Vector2SByte Down => new Vector2SByte(0, -1);
+		public static Vector2SByte Left => new(-1, 0);
+		public static Vector2SByte Right => new(1, 0);
+		public static Vector2SByte Up => new(0, 1);
+		public static Vector2SByte Down => new(0, -1);
 
 		public sbyte x;
 		public sbyte y;
@@ -33,8 +33,8 @@ namespace Fydar.Vox.Meshing
 
 		public bool Equals(Vector2SByte other)
 		{
-			return x == other.x &&
-				   y == other.y;
+			return x == other.x
+				&& y == other.y;
 		}
 
 		public override int GetHashCode()

@@ -4,9 +4,6 @@ using System.Text;
 
 namespace Fydar.Vox.VoxFiles
 {
-	/// <summary>
-	/// https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
-	/// </summary>
 	public struct VoxStructureChunk : IVoxDocumentStructure
 	{
 		private VoxDocument document;

@@ -10,7 +10,7 @@ namespace Fydar.Vox.Meshing
 
 		public override string ToString()
 		{
-			return $"nrm: {Normal}, col: {Colour}, dep: {Depth}";
+			return $"(nrm: {Normal}, col: {Colour}, dep: {Depth})";
 		}
 
 		public override bool Equals(object obj)
@@ -20,9 +20,9 @@ namespace Fydar.Vox.Meshing
 
 		public bool Equals(SurfaceDescription other)
 		{
-			return Normal.Equals(other.Normal) &&
-				   Colour.Equals(other.Colour) &&
-				   Depth == other.Depth;
+			return Normal.Equals(other.Normal)
+				&& Colour.Equals(other.Colour)
+				&& Depth == other.Depth;
 		}
 
 		public override int GetHashCode()

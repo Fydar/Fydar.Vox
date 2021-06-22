@@ -32,10 +32,10 @@ namespace Fydar.Vox.Meshing
 
 		public bool Equals(FaceColour24 other)
 		{
-			return TopLeft.Equals(other.TopLeft) &&
-				   TopRight.Equals(other.TopRight) &&
-				   BottomLeft.Equals(other.BottomLeft) &&
-				   BottomRight.Equals(other.BottomRight);
+			return TopLeft.Equals(other.TopLeft)
+				&& TopRight.Equals(other.TopRight)
+				&& BottomLeft.Equals(other.BottomLeft)
+				&& BottomRight.Equals(other.BottomRight);
 		}
 
 		public override int GetHashCode()
