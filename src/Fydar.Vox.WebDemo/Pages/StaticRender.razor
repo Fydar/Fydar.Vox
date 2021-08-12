@@ -8,175 +8,175 @@
 @inject HttpClient Http
 
 @{
-	DemoModel? model = null;
-	if (DemoModels.Models != null && Model < DemoModels.Models.Count)
-	{
-		model = DemoModels.Models[Model];
-	}
+  DemoModel? model = null;
+  if (DemoModels.Models != null && Model < DemoModels.Models.Count)
+  {
+    model = DemoModels.Models[Model];
+  }
 }
 
 <h1>Static Render</h1>
 
 <div style="min-height: 720px; width: 100%; overflow: hidden;">
 
-	<style>
-		.scene {
-			display: inline-block;
-			overflow: hidden;
-			box-sizing: border-box;
-			perspective: 2048px;
-			width: 100%;
-			height: 650px;
-		}
+  <style>
+    .scene {
+      display: inline-block;
+      overflow: hidden;
+      box-sizing: border-box;
+      perspective: 2048px;
+      width: 100%;
+      height: 650px;
+    }
 
-			.scene .mesh {
-				position: relative;
-				margin: auto;
-				transform-style: preserve-3d;
-				transition: transform 0.6s;
-			}
+      .scene .mesh {
+        position: relative;
+        margin: auto;
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+      }
 
-				.scene .mesh .surface {
-					transform-origin: 0% 0%;
-					position: absolute;
-					pointer-events: none;
-					touch-action: none;
-					image-rendering: pixelated;
-					user-select: none;
-					backface-visibility: hidden;
-				}
-	</style>
+        .scene .mesh .surface {
+          transform-origin: 0% 0%;
+          position: absolute;
+          pointer-events: none;
+          touch-action: none;
+          image-rendering: pixelated;
+          user-select: none;
+          backface-visibility: hidden;
+        }
+  </style>
 
-	<div class="scene" style="padding: 250px 50px 50px 50px;">
-		@if (model != null)
-		{
-			<PngLayerRenderer Model="model"
-							  FaceSize="FaceSize"
-							  Rotation="new Vector2(Direction, Pitch)"
-							  Scale="Scale" />
-		}
-	</div>
+  <div class="scene" style="padding: 250px 50px 50px 50px;">
+    @if (model != null)
+    {
+      <PngLayerRenderer Model="model"
+                        FaceSize="FaceSize"
+                        Rotation="new Vector2(Direction, Pitch)"
+                        Scale="Scale" />
+    }
+  </div>
 
 </div>
 
 <p>@(model?.Name ?? "no name")</p>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Model</div>
-	<div style="width: 64px;">@Model</div>
-	<input type="range" style="flex-grow: 1" min="0" max="@(DemoModels.Models?.Count - 1 ?? 0)" @bind="@Model" @bind:event="oninput" />
+  <div style="width: 96px; font-weight: bold;">Model</div>
+  <div style="width: 64px;">@Model</div>
+  <input type="range" style="flex-grow: 1" min="0" max="@(DemoModels.Models?.Count - 1 ?? 0)" @bind="@Model" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Direction</div>
-	<div style="width: 64px;">@Direction</div>
-	<input type="range" style="flex-grow: 1" min="0" max="360" @bind="@Direction" @bind:event="oninput" />
+  <div style="width: 96px; font-weight: bold;">Direction</div>
+  <div style="width: 64px;">@Direction</div>
+  <input type="range" style="flex-grow: 1" min="0" max="360" @bind="@Direction" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Pitch</div>
-	<div style="width: 64px;">@Pitch</div>
-	<input type="range" style="flex-grow: 1" min="-90" max="90" @bind="@Pitch" @bind:event="oninput" />
+  <div style="width: 96px; font-weight: bold;">Pitch</div>
+  <div style="width: 64px;">@Pitch</div>
+  <input type="range" style="flex-grow: 1" min="-90" max="90" @bind="@Pitch" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Scale</div>
-	<div style="width: 64px;">@Scale</div>
-	<input type="range" style="flex-grow: 1" min="0.01" max="50" step="0.01" @bind="@Scale" @bind:event="oninput" />
+  <div style="width: 96px; font-weight: bold;">Scale</div>
+  <div style="width: 64px;">@Scale</div>
+  <input type="range" style="flex-grow: 1" min="0.01" max="50" step="0.01" @bind="@Scale" @bind:event="oninput" />
 </div>
 
 <div class="input-group">
-	<div style="width: 96px; font-weight: bold;">Face Size</div>
-	<div style="width: 64px;">@FaceSize</div>
-	<input type="range" style="flex-grow: 1" min="1" max="128" step="1" @bind="@FaceSize" @bind:event="oninput" />
+  <div style="width: 96px; font-weight: bold;">Face Size</div>
+  <div style="width: 64px;">@FaceSize</div>
+  <input type="range" style="flex-grow: 1" min="1" max="128" step="1" @bind="@FaceSize" @bind:event="oninput" />
 </div>
 
 @code {
-	private int Model = 0;
+  private int Model = 0;
 
-	private float Direction = 30.0f;
-	private float Pitch = -45.0f;
+  private float Direction = 30.0f;
+  private float Pitch = -45.0f;
 
-	private float Scale = 15.0f;
-	private int FaceSize = 1;
+  private float Scale = 15.0f;
+  private int FaceSize = 1;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await DemoModels.Init(Http);
-	}
+  protected override async Task OnInitializedAsync()
+  {
+    await DemoModels.Init(Http);
+  }
 }
 
 @functions {
-	public string EncodeSvg(string svg)
-	{
-		var urlEncoded = UrlEncoder.Default.Encode(svg);
+  public string EncodeSvg(string svg)
+  {
+    var urlEncoded = UrlEncoder.Default.Encode(svg);
 
-		return "data:image/svg+xml," + urlEncoded;
-	}
+    return "data:image/svg+xml," + urlEncoded;
+  }
 
-	public string RenderSVG(IGrouping<SurfaceDescription, GreedySurface> greedySurfaces)
-	{
-		sbyte maxX = 0;
-		sbyte maxY = 0;
+  public string RenderSVG(IGrouping<SurfaceDescription, GreedySurface> greedySurfaces)
+  {
+    sbyte maxX = 0;
+    sbyte maxY = 0;
 
-		foreach (var surface in greedySurfaces)
-		{
-			foreach (var face in surface.Faces)
-			{
-				maxX = Math.Max(maxX, face.TopRight.x);
-				maxY = Math.Max(maxY, face.TopRight.y);
-			}
-		}
+    foreach (var surface in greedySurfaces)
+    {
+      foreach (var face in surface.Faces)
+      {
+        maxX = Math.Max(maxX, face.TopRight.x);
+        maxY = Math.Max(maxY, face.TopRight.y);
+      }
+    }
 
-		var sb = new StringBuilder();
+    var sb = new StringBuilder();
 
-		sb.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" viewBox=\"0 0 ");
+    sb.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" viewBox=\"0 0 ");
 
-		sb.Append(maxX * FaceSize);
+    sb.Append(maxX * FaceSize);
 
-		sb.Append(" ");
+    sb.Append(" ");
 
-		sb.Append(maxY * FaceSize);
+    sb.Append(maxY * FaceSize);
 
-		sb.Append("\" width=\"");
+    sb.Append("\" width=\"");
 
-		sb.Append(maxX * FaceSize);
+    sb.Append(maxX * FaceSize);
 
-		sb.Append("\" height=\"");
+    sb.Append("\" height=\"");
 
-		sb.Append(maxY * FaceSize);
+    sb.Append(maxY * FaceSize);
 
-		sb.Append("\">");
+    sb.Append("\">");
 
-		foreach (var surface in greedySurfaces)
-		{
-			foreach (var face in surface.Faces)
-			{
-				sb.Append("<rect x=\"");
-				sb.Append((face.Position.x * FaceSize) - 1);
+    foreach (var surface in greedySurfaces)
+    {
+      foreach (var face in surface.Faces)
+      {
+        sb.Append("<rect x=\"");
+        sb.Append((face.Position.x * FaceSize) - 1);
 
-				sb.Append("\" y=\"");
+        sb.Append("\" y=\"");
 
-				sb.Append((face.Position.y * FaceSize) - 1);
+        sb.Append((face.Position.y * FaceSize) - 1);
 
-				sb.Append("\" width=\"");
+        sb.Append("\" width=\"");
 
-				sb.Append((face.Scale.x * FaceSize) + 1);
+        sb.Append((face.Scale.x * FaceSize) + 1);
 
-				sb.Append("\" height=\"");
+        sb.Append("\" height=\"");
 
-				sb.Append((face.Scale.y * FaceSize) + 1);
+        sb.Append((face.Scale.y * FaceSize) + 1);
 
-				sb.Append("\" style=\"fill: ");
+        sb.Append("\" style=\"fill: ");
 
-				sb.Append(surface.Description.Colour.ToHexString());
+        sb.Append(surface.Description.Colour.ToHexString());
 
-				sb.Append("\" />");
+        sb.Append("\" />");
 
-			}
-		}
-		sb.Append("</svg>");
+      }
+    }
+    sb.Append("</svg>");
 
-		return sb.ToString();
-	}
+    return sb.ToString();
+  }
 }
