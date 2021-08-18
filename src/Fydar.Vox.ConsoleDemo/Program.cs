@@ -11,8 +11,8 @@ namespace Fydar.Vox.ConsoleDemo
 	{
 		private static void Main(string[] args)
 		{
-			ExportFile("deer.vox", "deer.html");
-			ExportFile("sniper.vox", "sniper.html");
+			ExportFile("deer", "deer.vox", "deer.html");
+			ExportFile("sniperrifle", "sniper.vox", "sniper.html");
 
 			FirstDemo.Run();
 
@@ -46,15 +46,15 @@ namespace Fydar.Vox.ConsoleDemo
 			}
 		}
 
-		private static void ExportFile(string source, string destination)
+		private static void ExportFile(string name, string source, string destination)
 		{
-			var oFileInfo = new FileInfo(source);
+			var fileInfo = new FileInfo(source);
 
-			var oDocument = new VoxDocument(File.ReadAllBytes(oFileInfo.FullName));
-			var oVoxelScene = new VoxelScene(oDocument);
-			var oModel = oVoxelScene.Models[0];
+			var voxDocument = new VoxDocument(File.ReadAllBytes(fileInfo.FullName));
+			var voxelScene = new VoxelScene(voxDocument);
+			var vodel = voxelScene.Models[0];
 
-			ToHtmlExporter.WriteToFile(oModel, destination);
+			ToHtmlExporter.WriteToFile(name, vodel, destination);
 		}
 
 		private static void PrintLayers(VoxelScene voxelScene)
