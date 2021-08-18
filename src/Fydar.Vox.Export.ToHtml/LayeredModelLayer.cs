@@ -15,7 +15,7 @@ namespace Fydar.Vox.Export.ToHtml
 
 		public string ToTransform()
 		{
-			float faceInset = 0.01f;
+			float faceInset = 0.0f;
 
 			var normal = Normal;
 			int depthOffset = Depth;
@@ -24,27 +24,27 @@ namespace Fydar.Vox.Export.ToHtml
 
 			if (normal == VoxelNormal.Up)
 			{
-				return $"rotateX(90deg) translate3d({Position.Left}px, {Position.Top - translationZ}px, {depthOffset - Model.Height - faceInset}px)";
+				return $"rotateX(90deg) translate3d({(Position.Left) * 16}px, {(Position.Top - translationZ) * 16}px, {(depthOffset - Model.Height - faceInset) * 16}px)";
 			}
 			else if (normal == VoxelNormal.Down)
 			{
-				return $"rotateX(-90deg) translate3d({Position.Left}px, {Model.Depth - Position.Bottom - translationZ}px, {depthOffset + Model.Height - faceInset}px)";
+				return $"rotateX(-90deg) translate3d({(Position.Left) * 16}px, {(Model.Depth - Position.Bottom - translationZ) * 16}px, {(depthOffset + Model.Height - faceInset) * 16}px)";
 			}
 			else if (normal == VoxelNormal.Left)
 			{
-				return $"rotateY(-90deg) translate3d({Position.Left - translationZ}px, {Model.Height - Position.Bottom}px, {depthOffset - faceInset}px)";
+				return $"rotateY(-90deg) translate3d({(Position.Left - translationZ) * 16}px, {(Model.Height - Position.Bottom) * 16}px, {(depthOffset - faceInset) * 16}px)";
 			}
 			else if (normal == VoxelNormal.Right)
 			{
-				return $"rotateY(90deg) translate3d({Model.Depth - Position.Right - translationZ}px, {Model.Height - Position.Bottom}px, {depthOffset - faceInset}px)";
+				return $"rotateY(90deg) translate3d({(Model.Depth - Position.Right - translationZ) * 16}px, {(Model.Height - Position.Bottom) * 16}px, {(depthOffset - faceInset) * 16}px)";
 			}
 			else if (normal == VoxelNormal.Back)
 			{
-				return $"rotateX(180deg) translate3d({Position.Left}px, {Position.Top - Model.Height}px, {depthOffset + translationZ - faceInset}px)";
+				return $"rotateX(180deg) translate3d({(Position.Left) * 16}px, {(Position.Top - Model.Height) * 16}px, {(depthOffset + translationZ - faceInset) * 16}px)";
 			}
 			else if (normal == VoxelNormal.Forward)
 			{
-				return $"translate3d({Position.Left}px, {Model.Height - Position.Bottom}px, {depthOffset - translationZ - faceInset}px)";
+				return $"translate3d({(Position.Left) * 16}px, {(Model.Height - Position.Bottom) * 16}px, {(depthOffset - translationZ - faceInset) * 16}px)";
 			}
 			return "";
 		}
