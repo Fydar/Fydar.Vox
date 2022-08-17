@@ -1,5 +1,8 @@
-﻿using Fydar.Vox.VoxFiles;
+﻿using Fydar.Vox.Meshing;
+using Fydar.Vox.VoxFiles;
+using System;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 
 namespace Fydar.Vox.Export.ToHtml
@@ -12,9 +15,13 @@ namespace Fydar.Vox.Export.ToHtml
 			string spriteAtlasImage = layeredModel.RenderImageString();
 
 			var rotation = new Vector2(55, -30);
-			float scale = 1.0f;
 
 			var fileInfo = new FileInfo(outputPath);
+
+			if (!fileInfo.Directory?.Exists ?? false)
+			{
+				fileInfo.Directory?.Create();
+			}
 
 			if (fileInfo.Exists)
 			{
@@ -30,7 +37,19 @@ namespace Fydar.Vox.Export.ToHtml
 			output.WriteLine($"    box-sizing: border-box;");
 			output.WriteLine($"    perspective: 1024px;");
 			output.WriteLine($"    width: 100%;");
+			output.WriteLine($"    --light-up: 0.95;");
+			output.WriteLine($"    --light-down: 0.6;");
+			output.WriteLine($"    --light-forward: 1.0;");
+			output.WriteLine($"    --light-back: 0.7;");
+			output.WriteLine($"    --light-left: 0.8;");
+			output.WriteLine($"    --light-right: 0.65;");
 			output.WriteLine($"  }}");
+
+			output.WriteLine($"");
+
+			output.WriteLine($"    .scene .transform {{");
+			output.WriteLine($"      transform-style: preserve-3d;");
+			output.WriteLine($"    }}");
 
 			output.WriteLine($"");
 
@@ -52,6 +71,30 @@ namespace Fydar.Vox.Export.ToHtml
 			output.WriteLine($"        user-select: none;");
 			output.WriteLine($"        backface-visibility: hidden;");
 			output.WriteLine($"      }}");
+			output.WriteLine($"");
+			output.WriteLine($"        .scene .mesh .surface.surface-up {{");
+			output.WriteLine($"          filter: brightness(var(--light-up));");
+			output.WriteLine($"        }}");
+			output.WriteLine($"");
+			output.WriteLine($"        .scene .mesh .surface.surface-down {{");
+			output.WriteLine($"          filter: brightness(var(--light-down));");
+			output.WriteLine($"        }}");
+			output.WriteLine($"");
+			output.WriteLine($"        .scene .mesh .surface.surface-forward {{");
+			output.WriteLine($"          filter: brightness(var(--light-forward));");
+			output.WriteLine($"        }}");
+			output.WriteLine($"");
+			output.WriteLine($"        .scene .mesh .surface.surface-back {{");
+			output.WriteLine($"          filter: brightness(var(--light-back));");
+			output.WriteLine($"        }}");
+			output.WriteLine($"");
+			output.WriteLine($"        .scene .mesh .surface.surface-left {{");
+			output.WriteLine($"          filter: brightness(var(--light-left));");
+			output.WriteLine($"        }}");
+			output.WriteLine($"");
+			output.WriteLine($"        .scene .mesh .surface.surface-right {{");
+			output.WriteLine($"          filter: brightness(var(--light-right));");
+			output.WriteLine($"        }}");
 
 
 			output.WriteLine($"  .anim-rotate-left {{");
@@ -100,50 +143,53 @@ namespace Fydar.Vox.Export.ToHtml
 			output.WriteLine($"</style>");
 
 
-			output.WriteLine($"<div style=\"height: 100vh\"></div>");
+			output.WriteLine($"<div style=\"height: 110vh\"></div>");
 
 
-			output.WriteLine($"<div class=\"scene scene-screen-perspective fsa-relative\" style = \"padding: 50px 50px 50px 50px;\">");
+			output.WriteLine($"<div class=\"scene scene-screen-perspective fsa-relative\" style=\"padding: 50px 50px 50px 50px;\">");
+			output.WriteLine($"  <div class=\"transform anim-rotate-left\">");
 
-
-			output.WriteLine($"<style>");
-			output.WriteLine($"  .mesh.mesh-{name} .surface {{");
-			output.WriteLine($"    background-image: url({spriteAtlasImage});");
-			output.WriteLine($"    background-size: {layeredModel.SpriteAtlasResolution.Width * 16}px {layeredModel.SpriteAtlasResolution.Height * 16}px;");
-			output.WriteLine($"  }}");
-			output.WriteLine($"</style>");
-
+			output.WriteLine($"");
 			output.WriteLine($"");
 
 			// output.Write($"<div class=\"idle-anim\">");
 
-			output.Write($"<div class=\"mesh mesh-{name} anim-rotate-left\" style=\"");
-			output.Write($"width: {model.Width * 16}px;");
-			output.Write($"height: {model.Height * 16}px;");
-			output.WriteLine($"transform: rotateX({rotation.Y}deg) rotateY({rotation.X}deg) scale3d({scale}, {scale}, {scale})\">");
+			output.WriteLine($"  <!-- Mesh '{name}' -->");
+			output.Write($"  <div class=\"mesh mesh-{name}\">");
+
+			output.WriteLine($"    <style>");
+			output.WriteLine($"      .mesh.mesh-{name} {{");
+			output.WriteLine($"        width: {ToPixels(model.Width * 16)};");
+			output.WriteLine($"        height: {ToPixels(model.Height * 16)};");
+			output.WriteLine($"        --half-depth: translateZ({ToPixels(-model.Depth * 16 / 2)});");
+
+			output.WriteLine($"      }}");
+
+			output.WriteLine($"        .mesh.mesh-{name} .surface {{");
+			output.WriteLine($"          background-image: url({spriteAtlasImage});");
+			output.WriteLine($"          background-size: {ToPixels(layeredModel.SpriteAtlasResolution.Width * 16)} {ToPixels(layeredModel.SpriteAtlasResolution.Height * 16)};");
+			output.WriteLine($"        }}");
+			output.WriteLine($"    </style>");
+
+			foreach (var sprite in layeredModel.Sprites.OrderBy(s => s.LayerStyle))
+			{
+				output.Write($"    <div class=\"surface surface-{sprite.LayerStyle}\" style=\"");
+				output.Write($"background-position: {ToPixels(sprite.UV.X * -16)} {ToPixels(sprite.UV.Y * -16)};");
+				output.Write($"width: {ToPixels(sprite.Position.Width * 16)};");
+				output.Write($"height: {ToPixels(sprite.Position.Height * 16)};");
+				output.WriteLine($"transform: {ToTransform(sprite)}\"></div>");
+			}
+			output.WriteLine($"  </div>");
 
 			output.WriteLine($"");
+			output.WriteLine($"");
 
-			foreach (var sprite in layeredModel.Sprites)
-			{
-				output.Write($"    <div class=\"surface\" style=\"");
-				output.Write($"background-position: -{sprite.UV.X * 16}px -{sprite.UV.Y * 16}px;");
-				output.Write($"width: {sprite.Position.Width * 16}px;");
-				output.Write($"height: {sprite.Position.Height * 16}px;");
-				output.WriteLine($"transform: {sprite.ToTransform()}\"></div>");
-			}
 			output.WriteLine($"</div>");
-
-			// output.WriteLine($"</div>");
-
+			output.WriteLine($"</div>");
 
 			output.WriteLine($"</div>");
 
-
-			output.WriteLine($"</div>");
-
-
-			output.WriteLine($"<div style=\"height: 100vh\"></div>");
+			output.WriteLine($"<div style=\"height: 110vh\"></div>");
 
 
 			output.WriteLine("<script>");
@@ -173,6 +219,7 @@ namespace Fydar.Vox.Export.ToHtml
 			output.WriteLine("        var scroll = invlerp(-bounds.height, window.innerHeight, bounds.top);");
 			output.WriteLine("");
 			output.WriteLine("        screenPerspective.style.perspectiveOrigin = \"50% \" + (((window.innerHeight / bounds.height) * ((scroll * 2) - 1) * -100) + 50) + \"%\";");
+			output.WriteLine("        screenPerspective.style.perspective = (1024 / window.devicePixelRatio) + \"px\";");
 			output.WriteLine("      }");
 			output.WriteLine("    }");
 			output.WriteLine("");
@@ -191,6 +238,56 @@ namespace Fydar.Vox.Export.ToHtml
 			output.WriteLine("    UpdateRelativeElements();");
 			output.WriteLine("    UpdateScreenPerspective();");
 			output.WriteLine("  </script>");
+		}
+
+		public static string ToTransform(LayeredModelLayer model)
+		{
+			float faceInset = 0.0f;
+
+			var normal = model.Normal;
+			int depthOffset = model.Depth;
+
+			float translationZ = model.Model.Depth * 0.5f;
+			if (normal == VoxelNormal.Up)
+			{
+				return $"rotateX(90deg) translate3d({ToPixels(model.Position.Left * 16)}, {ToPixels((model.Position.Top - translationZ) * 16)}, {ToPixels((depthOffset - model.Model.Height - faceInset) * 16)})";
+			}
+			else if (normal == VoxelNormal.Down)
+			{
+				return $"rotateX(-90deg) translate3d({ToPixels(model.Position.Left * 16)}, {ToPixels((model.Model.Depth - model.Position.Bottom - translationZ) * 16)}, {ToPixels((depthOffset + model.Model.Height - faceInset) * 16)})";
+			}
+			else if (normal == VoxelNormal.Left)
+			{
+				return $"rotateY(-90deg) translate3d({ToPixels((model.Position.Left - translationZ) * 16)}, {ToPixels((model.Model.Height - model.Position.Bottom) * 16)}, {ToPixels((depthOffset - faceInset) * 16)})";
+			}
+			else if (normal == VoxelNormal.Right)
+			{
+				return $"rotateY(90deg) translate3d({ToPixels((model.Model.Depth - model.Position.Right - translationZ) * 16)}, {ToPixels((model.Model.Height - model.Position.Bottom) * 16)}, {ToPixels((depthOffset - faceInset) * 16)})";
+			}
+			else if (normal == VoxelNormal.Back)
+			{
+				return $"rotateX(180deg) translate3d({ToPixels(model.Position.Left * 16)}, {ToPixels((model.Position.Top - model.Model.Height) * 16)}, {ToPixels((depthOffset + translationZ - faceInset) * 16)})";
+			}
+			else if (normal == VoxelNormal.Forward)
+			{
+				return $"translate3d({ToPixels(model.Position.Left * 16)}, {ToPixels((model.Model.Height - model.Position.Bottom) * 16)}, {ToPixels((depthOffset - translationZ - faceInset) * 16)})";
+			}
+			return "";
+		}
+
+		private static string ToPixels(int pixels)
+		{
+			return pixels == 0 ? "0" : $"{pixels}px";
+		}
+
+		private static string ToPixels(float pixels)
+		{
+			return Math.Abs(pixels) <= 0.01 ? "0" : $"{pixels}px";
+		}
+
+		private static string ToDegs(float degrees)
+		{
+			return Math.Abs(degrees) <= 0.01 ? "0" : $"{degrees:0.###}deg";
 		}
 	}
 }
