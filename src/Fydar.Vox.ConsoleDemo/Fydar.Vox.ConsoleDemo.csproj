@@ -19,15 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="demo-scene.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="deer.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="sniper.vox">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Update="models\**\*.vox">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
   </ItemGroup>
 
 </Project>

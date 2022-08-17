@@ -11,23 +11,23 @@ namespace Fydar.Vox.ConsoleDemo
 	{
 		private static void Main(string[] args)
 		{
-			ExportFile("deer", "deer.vox", "deer.html");
-			ExportFile("sniperrifle", "sniper.vox", "sniper.html");
+			foreach (var modelFile in Directory.EnumerateFiles("models", "*.vox"))
+			{
+				var name = new FileInfo(modelFile).Name.ToLower().Replace(".vox", "");
+				ExportFile(name, modelFile, $"output/{name}.html");
+			}
 
 			FirstDemo.Run();
 
-			var fileInfo = new FileInfo("demo-scene.vox");
+			var fileInfo = new FileInfo("models/demo-scene.vox");
 
 			var document = new VoxDocument(File.ReadAllBytes(fileInfo.FullName));
-			Console.WriteLine(document.FileVersionNumber);
-
-			// PrintStructure(document.Main);
 
 			var voxelScene = new VoxelScene(document);
 
 			Console.WriteLine("Colour Pallette");
-			VoxelConsoleRenderer.RenderLargeColourPallette(voxelScene.Pallette);
-			// VoxelConsoleRenderer.RenderSmallColourPallette(voxelScene.Pallette);
+			// VoxelConsoleRenderer.RenderLargeColourPallette(voxelScene.Pallette);
+			VoxelConsoleRenderer.RenderSmallColourPallette(voxelScene.Pallette);
 
 			Console.WriteLine();
 
@@ -39,11 +39,31 @@ namespace Fydar.Vox.ConsoleDemo
 			Console.WriteLine("Hierarchy");
 			PrintHierarchy(voxelScene);
 
+			Console.WriteLine();
+
 			Console.WriteLine("Models");
-			foreach (var model in voxelScene.Models)
+			PrintModels(voxelScene);
+		}
+
+		private static void PrintModels(VoxelScene voxelScene)
+		{
+			for (int i = 0; i < voxelScene.Models.Length; i++)
 			{
-				Console.WriteLine(model.Parents[0].Name);
+				var model = voxelScene.Models[i];
+				if (i == voxelScene.Models.Length - 1)
+				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+					Console.Write(" └─ ");
+				}
+				else
+				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
+					Console.Write(" ├─ ");
+				}
+				Console.ForegroundColor = ConsoleColor.Gray;
+				Console.WriteLine(model.Parents[0].Parent?.Name ?? "");
 			}
+			Console.ResetColor();
 		}
 
 		private static void ExportFile(string name, string source, string destination)
@@ -62,32 +82,21 @@ namespace Fydar.Vox.ConsoleDemo
 			for (int i = 0; i < voxelScene.Layers.Length; i++)
 			{
 				var layer = voxelScene.Layers[i];
-				if (layer.Hidden)
-				{
-					Console.ForegroundColor = ConsoleColor.DarkGray;
-				}
 
 				if (i == voxelScene.Layers.Length - 1)
 				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
 					Console.Write(" └─ ");
 				}
 				else
 				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
 					Console.Write(" ├─ ");
 				}
+				Console.ForegroundColor = layer.Hidden ? ConsoleColor.DarkGray : ConsoleColor.Gray;
 				Console.WriteLine($"{layer}");
-				Console.ResetColor();
 			}
-		}
-
-		private static void PrintStructure(VoxStructureChunk chunk, int indent = 0)
-		{
-			Console.WriteLine(new string(' ', indent * 2) + chunk.NameToString());
-
-			foreach (var child in chunk.Children)
-			{
-				PrintStructure(child, indent + 1);
-			}
+			Console.ResetColor();
 		}
 
 		private static void PrintHierarchy(VoxelScene voxelScene)
@@ -99,20 +108,8 @@ namespace Fydar.Vox.ConsoleDemo
 		{
 			switch (voxelNode)
 			{
-				case VoxelShape voxelShape:
-					// Console.WriteLine(voxelShape.Name);
-
-					foreach (var model in voxelShape.Models)
-					{
-						// WriteIndent(depth, last, carryMask);
-						// Console.WriteLine(model.GetHashCode().ToString());
-					}
-					break;
-
 				case VoxelGrouping voxelGrouping:
-					WriteIndent(depth, last, carryMask);
-					Console.WriteLine(voxelGrouping.ToString());
-
+				{
 					for (int i = 0; i < voxelGrouping.Children.Count; i++)
 					{
 						var child = voxelGrouping.Children[i];
@@ -120,23 +117,26 @@ namespace Fydar.Vox.ConsoleDemo
 						ulong childMask = carryMask;
 						if (!childIsLast)
 						{
-							childMask |= (ulong)1 << depth;
+							childMask |= (ulong)1 << (depth - 1);
 						}
-
-						PrintHierarchyRecursive(child, (byte)(depth + 1), childIsLast, childMask);
+						PrintHierarchyRecursive(child, depth, childIsLast, childMask);
 					}
 					break;
-
+				}
 				case VoxelTransform voxelTransform:
+				{
 					WriteIndent(depth, last, carryMask);
-					Console.WriteLine(voxelTransform.ToString());
+					Console.ForegroundColor = ConsoleColor.Gray;
+					Console.WriteLine(voxelTransform.Name);
 
 					if (voxelTransform.ChildNode != null)
 					{
 						PrintHierarchyRecursive(voxelTransform.ChildNode, (byte)(depth + 1), true, carryMask);
 					}
 					break;
+				}
 			}
+			Console.ResetColor();
 		}
 
 		private static void WriteIndent(int depth, bool last, ulong carryMask)
@@ -152,6 +152,7 @@ namespace Fydar.Vox.ConsoleDemo
 
 				if ((carryMask & targetMask) == targetMask)
 				{
+					Console.ForegroundColor = ConsoleColor.DarkGray;
 					Console.Write(" │  ");
 				}
 				else
@@ -161,10 +162,12 @@ namespace Fydar.Vox.ConsoleDemo
 			}
 			if (last)
 			{
+				Console.ForegroundColor = ConsoleColor.DarkGray;
 				Console.Write(" └─ ");
 			}
 			else
 			{
+				Console.ForegroundColor = ConsoleColor.DarkGray;
 				Console.Write(" ├─ ");
 			}
 		}
