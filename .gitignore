@@ -29,10 +29,11 @@ ExportedObj/
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
 
-FydarVoxUnity/*.sln
-FydarVoxUnity/*.csproj
-FydarVoxUnity/[Ll]ibrary/
-FydarVoxUnity/Assets/AssetStoreTools*
+src/FydarVoxUnity/*.sln
+src/FydarVoxUnity/*.csproj
+src/FydarVoxUnity/[Ll]ibrary/
+src/FydarVoxUnity/Assets/AssetStoreTools*
+src/FydarVoxUnity/UserSettings
 
 # Builds
 *.apk
@@ -54,4 +55,3 @@ Corridor/Library/metadata/
 Project/Library/EditorInstance.json
 *.stamp
 BenchmarkDotNet.Artifacts
-FydarVoxUnity/UserSettings
